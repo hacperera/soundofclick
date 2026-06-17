@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hacpix — Chaminda Perera | Photography</title>
+  <meta name="description" content="Photography by Chaminda Perera — a Sri Lankan photographer dedicated to creative exploration across landscape, nature, wildlife and astrophotography.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Pannellum: lightweight equirectangular 360° panorama viewer (used in the hero) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== Navigation ===== -->
+  <header class="nav">
+    <div class="wrap">
+      <a href="index.html" class="brand">hac<b>pix</b></a>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== Hero ===== -->
+  <section class="hero">
+    <div class="hero-slides" id="hero-slides"></div>
+    <div class="hero-content">
+      <p>A Sri Lankan photographer dedicated to creative exploration.</p>
+      <a href="gallery.html" class="btn btn--accent">View Galleries</a>
+      <div class="scroll-cue"><span>Scroll</span><span class="line"></span></div>
+    </div>
+    <button class="hero-fs" id="hero-fs" aria-label="Play full screen" title="Full screen">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h6V2H2v8h2V4zm16 0v6h2V2h-8v2h6zM4 14H2v8h8v-2H4v-6zm18 0h-2v6h-6v2h8v-8z"/></svg>
+    </button>
+  </section>
+
+  <!-- ===== Intro / narrative ===== -->
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow reveal-up">Photography by Chaminda Perera</p>
+      <p class="lede reveal-up">
+        I chase fleeting moments of light across mountains, coastlines and night skies —
+        <span class="dim">turning the landscapes of Sri Lanka and beyond into images you can step inside.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ===== Featured galleries ===== -->
+  <section class="section section--soft">
+    <div class="wrap">
+      <div class="section-head reveal-up">
+        <p class="eyebrow">Portfolio</p>
+        <h2 class="h2-sm">Selected work, by series.</h2>
+        <p>A body of work spanning landscape, nature, wildlife and the night sky. Choose a series to wander through.</p>
+      </div>
+      <div class="cat-grid" id="cat-grid" data-limit="6"></div>
+      <div style="margin-top:48px" class="reveal-up"><a href="gallery.html" class="btn">Explore the full gallery</a></div>
+    </div>
+  </section>
+
+  <!-- ===== Video portfolio ===== -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head reveal-up">
+        <p class="eyebrow">Motion</p>
+        <h2 class="h2-sm">In motion.</h2>
+        <p>A rotating reel of moving work. Hover to preview, click to play.</p>
+      </div>
+
+      <div class="video-row video-row--mixed" id="video-row"></div>
+    </div>
+  </section>
+
+  <!-- ===== Services ===== -->
+  <section class="section section--soft">
+    <div class="wrap">
+      <div class="section-head reveal-up">
+        <p class="eyebrow">Work With Me</p>
+        <h2>Prints, licensing &amp; commissions.</h2>
+      </div>
+      <div class="services">
+        <div class="service reveal-up">
+          <span class="num">01</span>
+          <h3>Fine Art Prints</h3>
+          <p>Elevate your space with high-quality professional prints. Available in various sizes and materials, with free worldwide shipping. Contact me with your preferred image to discuss options.</p>
+          <div class="print-row" data-prints="fineart"></div>
+        </div>
+        <div class="service reveal-up">
+          <span class="num">02</span>
+          <h3>Image Licensing</h3>
+          <p>My work is available for commercial use, including advertising, editorial and corporate projects. Email me with your requirements so we can tailor a solution for your needs.</p>
+          <div class="print-row" data-prints="licensing"></div>
+        </div>
+        <div class="service reveal-up">
+          <span class="num">03</span>
+          <h3>Commissioned Projects</h3>
+          <p>Seeking custom imagery? I collaborate with brands to deliver visuals that align with your creative vision. Let's discuss your project and see how we can work together.</p>
+          <div class="print-row" data-prints="commissions"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Closing CTA ===== -->
+  <section class="section">
+    <div class="wrap section-head center reveal-up">
+      <p class="eyebrow">Let's Create</p>
+      <h2>Have a project in mind?</h2>
+      <p>Whether it's a print for your wall, a licence for your campaign, or a story to tell together — I'd love to hear from you.</p>
+      <div style="margin-top:34px"><a href="contact.html" class="btn btn--accent">Get in touch</a></div>
+    </div>
+  </section>
+
+  <!-- ===== Screensaver (fullscreen slideshow) ===== -->
+  <div class="screensaver" id="screensaver" aria-hidden="true">
+    <div class="ss-stage" id="ss-stage"></div>
+    <button class="ss-exit" id="ss-exit" aria-label="Exit full screen">&times;</button>
+  </div>
+
+  <!-- ===== Video modal ===== -->
+  <div class="video-modal" id="video-modal" aria-hidden="true">
+    <button class="vm-close" aria-label="Close">&times;</button>
+    <video id="vm-video" controls playsinline></video>
+  </div>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-top">
+        <div>
+          <a href="index.html" class="brand">hac<b>pix</b></a>
+          <p>Photography by Chaminda Perera — a Sri Lankan photographer dedicated to creative exploration.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hacperera@gmail.com">Email</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> Chaminda Perera · hacpix</span>
+        <span>Portfolio · Blogs · Inspiration · Workshops</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <script src="js/images.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

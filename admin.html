@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>hacpix Studio — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--bg-soft); }
+    .studio { max-width: 980px; margin: 0 auto; padding: 40px clamp(18px,4vw,40px) 80px; }
+    .studio h1 { font-family: var(--serif); font-size: 40px; }
+    .studio h1 b { color: var(--accent); }
+    .tabs { display: flex; gap: 6px; margin: 26px 0 30px; border-bottom: 1px solid var(--line); }
+    .tab { background: none; border: 0; color: var(--text-dim); padding: 12px 18px; cursor: pointer;
+           font-size: 12px; letter-spacing: .16em; text-transform: uppercase; border-bottom: 2px solid transparent; }
+    .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+    .panel { display: none; } .panel.active { display: block; }
+    .card { background: var(--surface); border: 1px solid var(--line); padding: 22px; margin-bottom: 16px; }
+    .card h3 { font-family: var(--serif); font-size: 22px; margin: 0 0 6px; }
+    .muted { color: var(--text-dim); font-size: 14px; line-height: 1.7; }
+    .row { display: flex; gap: 14px; flex-wrap: wrap; }
+    .row > * { flex: 1 1 200px; }
+    label { display:block; font-size: 11px; letter-spacing:.18em; text-transform:uppercase; color: var(--text-dim); margin: 14px 0 8px; }
+    input, select, textarea { width:100%; background: var(--bg); border:1px solid var(--line); color: var(--text);
+            padding: 11px 13px; font-family: var(--sans); font-size: 14px; }
+    textarea { min-height: 200px; resize: vertical; font-family: ui-monospace, Menlo, Consolas, monospace; line-height:1.6; }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+    .btn-sm { display:inline-block; cursor:pointer; border:1px solid var(--line); background:transparent; color:var(--text);
+              padding: 10px 18px; font-size: 11px; letter-spacing:.18em; text-transform:uppercase; }
+    .btn-sm.go { background: var(--accent); border-color: var(--accent); color:#111; }
+    .btn-sm + .btn-sm { margin-left: 8px; }
+    .post-item { display:flex; align-items:center; gap:14px; padding:12px; border:1px solid var(--line); margin-bottom:8px; background:var(--bg); }
+    .post-item img { width:64px; height:48px; object-fit:cover; }
+    .post-item .t { font-family: var(--serif); font-size:18px; }
+    .post-item .m { font-size:11px; color:var(--text-faint); letter-spacing:.12em; text-transform:uppercase; }
+    .post-item .sp { flex:1; }
+    .pill { display:inline-block; background:var(--accent-soft); color:var(--accent); font-size:11px; padding:3px 9px; border-radius:20px; }
+    code { background: var(--bg); padding: 2px 6px; border:1px solid var(--line); font-size: 13px; }
+    .note { border-left: 2px solid var(--accent); padding: 4px 0 4px 16px; margin: 16px 0; color: var(--text-dim); font-size:14px; }
+    a.lnk { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="studio">
+    <h1>hac<b>pix</b> Studio</h1>
+    <p class="muted">A lightweight control panel for managing your site. While the site is a set of static files, this tool prepares the data files for you; the <a class="lnk" href="DASHBOARD.md">DASHBOARD.md</a> guide explains how to make this a true online dashboard once you publish.</p>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="blog">Blog posts</button>
+      <button class="tab" data-tab="galleries">Photos &amp; videos</button>
+      <button class="tab" data-tab="messages">Messages</button>
+    </div>
+
+    <!-- ===== BLOG ===== -->
+    <section class="panel active" id="tab-blog">
+      <div class="card">
+        <h3>Write a post</h3>
+        <p class="muted">Fill this in, click <b>Add / update post</b>, then <b>Download posts.js</b> and replace the file at <code>js/posts.js</code>. Refresh the site to see it live.</p>
+        <div class="row">
+          <div><label>Title</label><input id="f-title"></div>
+          <div><label>Category</label><input id="f-cat" placeholder="Inspiration / Tutorial / Field Notes…"></div>
+        </div>
+        <div class="row">
+          <div><label>Read time</label><input id="f-read" placeholder="6 min read"></div>
+          <div><label>Date</label><input id="f-date" type="date"></div>
+          <div><label>Slug (URL id)</label><input id="f-slug" placeholder="auto from title"></div>
+        </div>
+        <label>Cover image (path under the project folder)</label>
+        <input id="f-thumb" list="img-list" placeholder="photos_Landscape/_E2A7174.jpg">
+        <datalist id="img-list"></datalist>
+        <label>Excerpt (one or two sentences shown on the blog page)</label>
+        <textarea id="f-excerpt" style="min-height:70px"></textarea>
+        <label>Body — one block per line. Start a line with <code>##</code> for a subheading.</label>
+        <textarea id="f-body"></textarea>
+        <div style="margin-top:16px">
+          <button class="btn-sm go" id="save-post">Add / update post</button>
+          <button class="btn-sm" id="clear-post">Clear form</button>
+          <button class="btn-sm" id="download-posts">Download posts.js</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Existing posts <span class="pill" id="post-count"></span></h3>
+        <div id="post-list"></div>
+      </div>
+    </section>
+
+    <!-- ===== GALLERIES ===== -->
+    <section class="panel" id="tab-galleries">
+      <div class="card">
+        <h3>How galleries work</h3>
+        <p class="muted">Photos and videos are organised as folders. To add or remove media:</p>
+        <ol class="muted">
+          <li>Drop image files into the matching <code>photos_*</code> folder (or make a new <code>photos_Something</code> folder). Videos go in <code>Video/</code>; print samples in an optional <code>prints/</code> folder.</li>
+          <li>Run <code>python3 generate_manifest.py</code> in the project folder.</li>
+          <li>Refresh the site — galleries, the hero, the In&nbsp;Motion reel and the print samples all update automatically.</li>
+        </ol>
+        <div class="note">Video orientation (portrait vs landscape) is detected automatically. New <code>photos_*</code> folders appear as new series with no extra setup.</div>
+      </div>
+      <div class="card">
+        <h3>Current content</h3>
+        <div id="gallery-summary" class="muted"></div>
+      </div>
+    </section>
+
+    <!-- ===== MESSAGES ===== -->
+    <section class="panel" id="tab-messages">
+      <div class="card">
+        <h3>Where messages go</h3>
+        <p class="muted">The contact form is wired to <b>FormSubmit</b>, which forwards every enquiry to <code>hacperera@gmail.com</code>. So today, your inbox <i>is</i> your message dashboard — no server required.</p>
+        <ul class="muted">
+          <li>Each submission arrives as an email you can reply to directly.</li>
+          <li>FormSubmit also offers a free dashboard and CSV export at <a class="lnk" href="https://formsubmit.co" target="_blank" rel="noopener">formsubmit.co</a>.</li>
+        </ul>
+        <div class="note">When you publish on a host with built-in forms (e.g. Netlify Forms) or add a small backend, messages can be stored in a database and listed right here. See <a class="lnk" href="DASHBOARD.md">DASHBOARD.md</a>.</div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/images.js"></script>
+  <script src="js/posts.js"></script>
+  <script>
+  (function () {
+    var posts = (window.POSTS || []).map(function (p) { return JSON.parse(JSON.stringify(p)); });
+
+    // Tabs
+    document.querySelectorAll(".tab").forEach(function (t) {
+      t.addEventListener("click", function () {
+        document.querySelectorAll(".tab").forEach(function (x) { x.classList.remove("active"); });
+        document.querySelectorAll(".panel").forEach(function (x) { x.classList.remove("active"); });
+        t.classList.add("active");
+        document.getElementById("tab-" + t.dataset.tab).classList.add("active");
+      });
+    });
+
+    // Image datalist + gallery summary
+    var dl = document.getElementById("img-list");
+    var summ = [];
+    (window.GALLERY_DATA || []).forEach(function (c) {
+      summ.push(c.title + ": " + c.images.length + " photos");
+      c.images.forEach(function (f) {
+        var o = document.createElement("option");
+        o.value = c.folder + "/" + f;
+        dl.appendChild(o);
+      });
+    });
+    var vd = window.VIDEO_DATA || { portrait: [], landscape: [] };
+    var gs = document.getElementById("gallery-summary");
+    if (gs) gs.innerHTML = "<b>Series:</b> " + summ.join(" · ") +
+      "<br><b>Videos:</b> " + (vd.portrait || []).length + " portrait, " + (vd.landscape || []).length + " landscape" +
+      "<br><b>Prints folder:</b> " + ((window.PRINTS_DATA && window.PRINTS_DATA.images.length) || 0) + " images";
+
+    // Slug helper
+    function slugify(s) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""); }
+    var $ = function (id) { return document.getElementById(id); };
+
+    function renderList() {
+      $("post-count").textContent = posts.length;
+      var box = $("post-list"); box.innerHTML = "";
+      posts.forEach(function (p, i) {
+        var d = document.createElement("div");
+        d.className = "post-item";
+        d.innerHTML = '<img src="' + p.thumb + '" alt=""><div><div class="t">' + p.title +
+          '</div><div class="m">' + p.category + ' · ' + p.date + '</div></div><div class="sp"></div>' +
+          '<button class="btn-sm" data-edit="' + i + '">Edit</button>' +
+          '<button class="btn-sm" data-del="' + i + '">Delete</button>';
+        box.appendChild(d);
+      });
+      box.querySelectorAll("[data-edit]").forEach(function (b) {
+        b.addEventListener("click", function () { loadIntoForm(posts[+b.dataset.edit]); });
+      });
+      box.querySelectorAll("[data-del]").forEach(function (b) {
+        b.addEventListener("click", function () { posts.splice(+b.dataset.del, 1); renderList(); });
+      });
+    }
+
+    function loadIntoForm(p) {
+      $("f-title").value = p.title || ""; $("f-cat").value = p.category || "";
+      $("f-read").value = p.read || ""; $("f-date").value = p.date || "";
+      $("f-slug").value = p.slug || ""; $("f-thumb").value = p.thumb || "";
+      $("f-excerpt").value = p.excerpt || ""; $("f-body").value = (p.body || []).join("\n");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    $("clear-post").addEventListener("click", function () {
+      ["f-title","f-cat","f-read","f-date","f-slug","f-thumb","f-excerpt","f-body"].forEach(function (id) { $(id).value = ""; });
+    });
+
+    $("save-post").addEventListener("click", function () {
+      var title = $("f-title").value.trim();
+      if (!title) { alert("A title is required."); return; }
+      var slug = $("f-slug").value.trim() || slugify(title);
+      var post = {
+        slug: slug,
+        title: title,
+        category: $("f-cat").value.trim() || "Journal",
+        read: $("f-read").value.trim() || "5 min read",
+        date: $("f-date").value || new Date().toISOString().slice(0, 10),
+        thumb: $("f-thumb").value.trim(),
+        excerpt: $("f-excerpt").value.trim(),
+        body: $("f-body").value.split("\n").map(function (s) { return s.trim(); }).filter(Boolean)
+      };
+      var at = posts.findIndex(function (p) { return p.slug === slug; });
+      if (at >= 0) posts[at] = post; else posts.unshift(post);
+      renderList();
+      alert("Saved “" + title + "”. Now click ‘Download posts.js’ and replace js/posts.js.");
+    });
+
+    $("download-posts").addEventListener("click", function () {
+      var txt = "/* hacpix blog posts — generated by hacpix Studio (admin.html) */\n" +
+                "window.POSTS = " + JSON.stringify(posts, null, 2) + ";\n";
+      var blob = new Blob([txt], { type: "text/javascript" });
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "posts.js";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    renderList();
+  })();
+  </script>
+</body>
+</html>

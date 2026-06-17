@@ -1,0 +1,14 @@
+# Netlify configuration for the hacpix static site.
+# No build step — the site is plain HTML/CSS/JS; just publish the repo root.
+# (Run `python3 generate_manifest.py` locally and commit the results before deploying.)
+
+[build]
+  publish = "."
+  command = ""
+
+# Cache the generated image variants for a week. They only change when you
+# regenerate from a changed source, so this is safe and keeps repeat visits fast.
+[[headers]]
+  for = "/*/_web/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

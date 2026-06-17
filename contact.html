@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — hacpix | Chaminda Perera</title>
+  <meta name="description" content="Get in touch with Chaminda Perera for prints, licensing and commissioned photography projects.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="nav solid">
+    <div class="wrap">
+      <a href="index.html" class="brand">hac<b>pix</b></a>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html" class="active">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-head">
+    <p class="eyebrow">Contact</p>
+    <h1>Let's talk</h1>
+    <p>Prints, licensing, commissions or just to say hello — I read every message.</p>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="contact-grid">
+
+        <div class="contact-info reveal-up">
+          <h2>Get in touch.</h2>
+          <p>Tell me a little about what you have in mind — a wall that needs a print, an image to licence, or a project to shoot — and I'll get back to you as soon as I can.</p>
+          <ul class="contact-list">
+            <li><div class="k">Email</div><div class="v"><a href="mailto:hacperera@gmail.com">hacperera@gmail.com</a></div></li>
+            <li><div class="k">Based in</div><div class="v">Sri Lanka · available worldwide</div></li>
+            <li><div class="k">Social</div><div class="v"><a href="#">Instagram</a> &nbsp;/&nbsp; <a href="#">Facebook</a></div></li>
+          </ul>
+        </div>
+
+        <div class="reveal-up">
+          <form id="contact-form" action="https://formsubmit.co/hacperera@gmail.com" method="POST">
+            <div class="field">
+              <label for="name">Name</label>
+              <input id="name" name="name" type="text" required>
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required>
+            </div>
+            <div class="field">
+              <label for="subject">I'm interested in</label>
+              <select id="subject" name="subject">
+                <option>Fine art prints</option>
+                <option>Image licensing</option>
+                <option>A commissioned project</option>
+                <option>Something else</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" required></textarea>
+            </div>
+            <button class="btn btn--accent" type="submit">Send message</button>
+            <p class="form-note">This form is wired to <strong>FormSubmit</strong> and delivers to hacperera@gmail.com. The first submission triggers a one-time confirmation email — or swap in your preferred form service.</p>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-top">
+        <div>
+          <a href="index.html" class="brand">hac<b>pix</b></a>
+          <p>Photography by Chaminda Perera — a Sri Lankan photographer dedicated to creative exploration.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hacperera@gmail.com">Email</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> Chaminda Perera · hacpix</span>
+        <span>Portfolio · Blogs · Inspiration · Workshops</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/images.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Series — hacpix | Chaminda Perera</title>
+  <meta name="description" content="A photography series by Chaminda Perera.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <!-- Pannellum: lightweight equirectangular 360° panorama viewer -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+  <!-- Leaflet: map showing where each 360° panorama was captured -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="nav solid">
+    <div class="wrap">
+      <a href="index.html" class="brand">hac<b>pix</b></a>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="gallery.html" class="active">Gallery</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="gallery-intro">
+    <div class="wrap">
+      <a href="gallery.html" class="eyebrow" style="display:inline-block">&larr; All galleries</a>
+      <div class="section-head">
+        <h2 id="series-title">Series</h2>
+        <p>A selection of recent work — <span id="series-count"></span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="masonry" id="masonry"></div>
+  </div>
+
+  <section class="section section--soft series-foot">
+    <div class="wrap section-head center">
+      <a class="btn btn--accent" id="series-next" href="gallery.html">Next series</a>
+      <div style="margin-top:18px"><a class="eyebrow" href="gallery.html" style="display:inline-block">View all galleries</a></div>
+    </div>
+  </section>
+
+  <!-- ===== Lightbox ===== -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lb-btn lb-close" aria-label="Close">&times;</button>
+    <button class="lb-btn lb-prev" aria-label="Previous">&#8249;</button>
+    <img id="lb-img" alt="Enlarged photograph">
+    <button class="lb-btn lb-next" aria-label="Next">&#8250;</button>
+    <div class="lb-meta" id="lb-meta"></div>
+  </div>
+
+  <!-- ===== 360° panorama viewer ===== -->
+  <div class="pano-modal" id="pano-modal" aria-hidden="true">
+    <button class="pano-close" aria-label="Close panorama">&times;</button>
+    <div class="pano-stage" id="pano-stage"></div>
+    <aside class="pano-map" id="pano-map">
+      <div class="pano-map-canvas" id="pano-map-canvas"></div>
+      <div class="pano-map-label" id="pano-map-label"></div>
+    </aside>
+    <div class="pano-hint">Drag to look around · scroll to zoom · this is a 360° photo</div>
+  </div>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-top">
+        <div>
+          <a href="index.html" class="brand">hac<b>pix</b></a>
+          <p>Photography by Chaminda Perera — a Sri Lankan photographer dedicated to creative exploration.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hacperera@gmail.com">Email</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> Chaminda Perera · hacpix</span>
+        <span>Portfolio · Blogs · Inspiration · Workshops</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/pano-locations.js"></script>
+  <script src="js/images.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

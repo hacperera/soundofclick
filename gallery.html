@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galleries — hacpix | Chaminda Perera</title>
+  <meta name="description" content="Photography portfolios by Chaminda Perera — landscape, nature, wildlife, astrophotography and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="nav solid">
+    <div class="wrap">
+      <a href="index.html" class="brand">hac<b>pix</b></a>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="gallery.html" class="active">Gallery</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="gallery-intro">
+    <div class="wrap">
+      <p class="eyebrow">Portfolio</p>
+      <div class="section-head"><h2>Galleries.</h2><p>Each series is its own immersive scroll. Choose where to wander.</p></div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+
+  <div style="height: clamp(80px,12vh,140px)"></div>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-top">
+        <div>
+          <a href="index.html" class="brand">hac<b>pix</b></a>
+          <p>Photography by Chaminda Perera — a Sri Lankan photographer dedicated to creative exploration.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hacperera@gmail.com">Email</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> Chaminda Perera · hacpix</span>
+        <span>Portfolio · Blogs · Inspiration · Workshops</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/images.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

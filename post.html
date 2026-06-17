@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Journal — hacpix | Chaminda Perera</title>
+  <meta name="description" content="A journal entry by Chaminda Perera.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="nav solid">
+    <div class="wrap">
+      <a href="index.html" class="brand">hac<b>pix</b></a>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="blog.html" class="active">Blog</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <article id="article">
+    <!-- filled by main.js from posts.js -->
+    <div class="article-head">
+      <div class="wrap">
+        <a href="blog.html" class="eyebrow" style="display:inline-block">&larr; The Blog</a>
+        <p class="eyebrow" id="post-cat" style="margin-top:14px"></p>
+        <h1 id="post-title"></h1>
+        <p class="post-byline" id="post-byline"></p>
+      </div>
+    </div>
+    <div class="article-hero"><img id="post-hero" alt=""></div>
+    <div class="article-body wrap" id="post-body"></div>
+
+    <nav class="article-nav wrap" id="post-nav"></nav>
+  </article>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-top">
+        <div>
+          <a href="index.html" class="brand">hac<b>pix</b></a>
+          <p>Photography by Chaminda Perera — a Sri Lankan photographer dedicated to creative exploration.</p>
+        </div>
+        <div>
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="gallery.html">Gallery</a></li>
+            <li><a href="blog.html">Blog</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="contact.html">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="mailto:hacperera@gmail.com">Email</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="#" target="_blank" rel="noopener">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span id="year"></span> Chaminda Perera · hacpix</span>
+        <span>Portfolio · Blogs · Inspiration · Workshops</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/images.js"></script>
+  <script src="js/posts.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
