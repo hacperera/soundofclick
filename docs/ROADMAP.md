@@ -76,7 +76,9 @@ the site live today — but the sequence above minimizes rework.
   as `window.MEDIA`; `js/main.js` renders responsive `<picture>`/`srcset`; 360 viewer
   loads a sized wide variant. Workflow: run `python3 generate_manifest.py` after adding
   photos; commit the `_web/` folders + `images.js`.)_
-- [ ] 2. Real hosting + custom domain
+- [x] 2. Real hosting _(done 2026-06-17 — repo github.com/hacperera/soundofclick;
+  auto-deploys to Netlify at https://dashing-pudding-2c0a43.netlify.app. Verified
+  pages + AVIF/WebP variants + 360 webp serve over HTTPS.)_  · [ ] custom domain (optional)
 - [ ] 3. Site-wide photo map
 - [ ] 3b. 360 virtual tours with hotspots
 - [ ] 4a. AI captioning & tagging

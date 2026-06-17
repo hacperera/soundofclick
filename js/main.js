@@ -145,12 +145,25 @@
     } else {
       def.srcs.forEach(function (src) {
         var img = document.createElement("img");
-        img.src = src;
+        // Only the first (active) slide loads immediately; the rest are loaded
+        // just before their turn (see loadSlide) so the home page isn't forced
+        // to download every hero image up front.
+        if (active) { img.src = src; img.setAttribute("fetchpriority", "high"); }
+        else { img.dataset.src = src; }
         img.alt = "";
         s.appendChild(img);
       });
     }
     return s;
+  }
+
+  // Kick off loading of any not-yet-loaded images in a slide.
+  function loadSlide(slide) {
+    if (!slide) return;
+    slide.querySelectorAll("img[data-src]").forEach(function (img) {
+      img.src = img.dataset.src;
+      img.removeAttribute("data-src");
+    });
   }
 
   // Spin up an auto-rotating panorama inside a hero pano slide (showcase mode:
@@ -184,8 +197,10 @@
   // Chained cross-fade cycler. Returns a stop() function.
   function cycleSlides(slides) {
     if (!slides.length) return function () {};
+    loadSlide(slides[0]);
     if (slides[0].classList.contains("pano")) mountHeroPano(slides[0]);
     if (slides.length < 2) return function () { unmountHeroPano(slides[0]); };
+    loadSlide(slides[1]);   // warm the next slide so the first crossfade is smooth
     var idx = 0, timer = null;
     function step() {
       var dur = slides[idx].classList.contains("pano") ? PANO_MS : SLIDE_MS;
@@ -194,7 +209,9 @@
         unmountHeroPano(slides[idx]);
         idx = (idx + 1) % slides.length;
         slides[idx].classList.add("active");
+        loadSlide(slides[idx]);
         mountHeroPano(slides[idx]);
+        loadSlide(slides[(idx + 1) % slides.length]);   // pre-warm the upcoming slide
         step();
       }, dur);
     }
