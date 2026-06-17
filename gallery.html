@@ -41,7 +41,36 @@
 
   <div style="height: clamp(80px,12vh,140px)"></div>
 
-  <footer class="footer">
+<!-- ===== Newsletter ===== -->
+  <section class="section section--soft newsletter">
+    <div class="wrap section-head center reveal-up">
+      <p class="eyebrow">Stay in touch</p>
+      <h2 class="h2-sm">Join my newsletter</h2>
+      <p>to stay up to date with new workshops, print sales, and more!</p>
+      <form name="newsletter" method="POST" data-netlify="true" netlify-honeypot="bot-field"
+            class="newsletter-form" id="newsletter-form">
+        <input type="hidden" name="form-name" value="newsletter">
+        <p class="newsletter-hp"><label>Leave this empty: <input name="bot-field"></label></p>
+        <input type="email" name="email" class="newsletter-input" placeholder="Email Address"
+               aria-label="Email address" required>
+        <button type="submit" class="btn btn--accent newsletter-btn">Subscribe</button>
+      </form>
+      <p class="newsletter-msg" id="newsletter-msg" role="status" aria-live="polite"></p>
+      <div class="newsletter-social">
+        <a href="#" aria-label="Instagram" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.9.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.86s0 3.6-.07 4.86c-.05 1.17-.25 1.8-.41 2.23a3.7 3.7 0 0 1-.9 1.38 3.7 3.7 0 0 1-1.38.9c-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.86.07s-3.6 0-4.86-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.21 15.6 2.2 15.2 2.2 12s0-3.6.07-4.86c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.4 2.21 8.8 2.2 12 2.2m0 1.95c-3.15 0-3.52.01-4.77.07-.9.04-1.39.2-1.71.32-.43.17-.74.37-1.06.69-.32.32-.52.63-.69 1.06-.13.32-.28.81-.32 1.71-.06 1.25-.07 1.62-.07 4.77s.01 3.52.07 4.77c.04.9.2 1.39.32 1.71.17.43.37.74.69 1.06.32.32.63.52 1.06.69.32.13.81.28 1.71.32 1.25.06 1.62.07 4.77.07s3.52-.01 4.77-.07c.9-.04 1.39-.2 1.71-.32.43-.17.74-.37 1.06-.69.32-.32.52-.63.69-1.06.13-.32.28-.81.32-1.71.06-1.25.07-1.62.07-4.77s-.01-3.52-.07-4.77c-.04-.9-.2-1.39-.32-1.71a2.85 2.85 0 0 0-.69-1.06 2.85 2.85 0 0 0-1.06-.69c-.32-.13-.81-.28-1.71-.32-1.25-.06-1.62-.07-4.77-.07m0 3.32a4.53 4.53 0 1 1 0 9.06 4.53 4.53 0 0 1 0-9.06m0 1.95a2.58 2.58 0 1 0 0 5.16 2.58 2.58 0 0 0 0-5.16m5.77-2.17a1.06 1.06 0 1 1-2.12 0 1.06 1.06 0 0 1 2.12 0"/></svg>
+        </a>
+        <a href="#" aria-label="Facebook" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.29-.04-1.27-.13-2.41-.13-2.39 0-4.02 1.46-4.02 4.13v2.3H7.6V13h2.66v8h3.24z"/></svg>
+        </a>
+        <a href="#" aria-label="YouTube" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 7.5a3 3 0 0 0-2.1-2.1C19 4.8 12 4.8 12 4.8s-7 0-8.9.6A3 3 0 0 0 1 7.5C.4 9.4.4 12 .4 12s0 2.6.6 4.5A3 3 0 0 0 3.1 18.6c1.9.6 8.9.6 8.9.6s7 0 8.9-.6A3 3 0 0 0 23 16.5c.6-1.9.6-4.5.6-4.5s0-2.6-.6-4.5M9.8 15.3V8.7l5.7 3.3-5.7 3.3z"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+    <footer class="footer">
     <div class="wrap">
       <div class="footer-top">
         <div>
