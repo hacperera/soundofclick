@@ -13,6 +13,6 @@
      zoom      : optional initial zoom (default 13)
    ============================================================ */
 window.PANO_LOCATIONS = {
-  "R0011197.JPG": { lat: 6.9271, lng: 79.8612, label: "Colombo, Sri Lanka (sample — replace)", zoom: 13 },
-  "R0011293.JPG": { lat: 7.2906, lng: 80.6337, label: "Kandy, Sri Lanka (sample — replace)", zoom: 13 }
+  "R0011197.JPG": { lat: 40.917194, lng: 48.624222, label: "Azerbaijan", zoom: 13 },
+  "R0011293.JPG": { lat: 6.909111, lng: 79.900639, label: "Kotte, Sri Lanka", zoom: 13 }
 };
