@@ -577,9 +577,11 @@
     var is360 = cat.id === "360";
 
     lb.items = [];
+    var panoItems = [];   // ordered list of 360 panoramas for the tour viewer
     cat.images.forEach(function (file) {
       var i = lb.items.length;
       lb.items.push({ folder: cat.folder, file: file, cat: cat.title });
+      if (is360) panoItems.push({ folder: cat.folder, file: file, src: panoSrc(cat.folder, file) });
 
       var tile = document.createElement("figure");
       tile.className = "tile" + (is360 ? " tile--360" : "");
@@ -599,12 +601,13 @@
       cap.innerHTML = '<span class="c">' + cat.title + '</span>';
       tile.appendChild(cap);
       if (is360) {
-        tile.addEventListener("click", function () { openPano(panoSrc(cat.folder, file)); });
+        tile.addEventListener("click", function () { openPano(i); });
       } else {
         tile.addEventListener("click", function () { openLightbox(parseInt(tile.dataset.idx, 10)); });
       }
       grid.appendChild(tile);
     });
+    panoTour.items = panoItems;
     revealTiles();
 
     // Re-render if the user navigates between series via hash change (bind once)
@@ -669,90 +672,194 @@
     });
   }
 
-  /* ---------- 360° panorama viewer (equirectangular, via Pannellum) ---------- */
+  /* ---------- 360° panorama viewer (equirectangular tour, via Pannellum) ---------- */
   var panoViewer = null, panoMap = null, panoMarker = null;
+  var panoTour = { items: [], idx: 0 };   // items: [{folder, file, src}]
+  var NEARBY_KM = 3;                       // jump arrows only between panoramas this close
 
-  // Pull the bare filename out of a (possibly URL-encoded) image path.
-  function panoFileName(src) {
-    try { src = decodeURIComponent(src); } catch (e) {}
-    return src.split("/").pop();
+  // Resolve a panorama's location: manual PANO_LOCATIONS first, else EXIF GPS.
+  function panoLoc(item) {
+    if (!item) return null;
+    var locs = window.PANO_LOCATIONS || {};
+    if (locs[item.file]) return locs[item.file];
+    var m = media(item.folder, item.file);
+    if (m && m.geo) return { lat: m.geo.lat, lng: m.geo.lng };
+    return null;
   }
 
-  // Show/update the location mini-map for the panorama, if a location is known.
-  function updatePanoMap(src) {
+  function haversineKm(a, b) {
+    var R = 6371, rad = Math.PI / 180;
+    var dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+    var s = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 2 * R * Math.asin(Math.sqrt(s));
+  }
+  function bearingDeg(a, b) {   // initial compass bearing a->b (0=N, 90=E)
+    var rad = Math.PI / 180, deg = 180 / Math.PI;
+    var dLng = (b.lng - a.lng) * rad;
+    var y = Math.sin(dLng) * Math.cos(b.lat * rad);
+    var x = Math.cos(a.lat * rad) * Math.sin(b.lat * rad) -
+            Math.sin(a.lat * rad) * Math.cos(b.lat * rad) * Math.cos(dLng);
+    return (Math.atan2(y, x) * deg + 360) % 360;
+  }
+
+  // Custom transparent arrow element for a directional jump hotspot.
+  function panoJumpTooltip(div, args) {
+    div.innerHTML = '<span class="pano-jump-ico">➤</span>';
+    if (args && args.label) {
+      var t = document.createElement("span");
+      t.className = "pano-jump-label";
+      t.textContent = args.label;
+      div.appendChild(t);
+    }
+  }
+
+  // Build "scene" hotspots pointing at nearby panoramas, placed at their bearing.
+  function panoHotSpots(i) {
+    var from = panoLoc(panoTour.items[i]);
+    if (!from || from.lat == null) return [];
+    var north = (from.north != null) ? from.north : 0;
+    var spots = [];
+    panoTour.items.forEach(function (it, j) {
+      if (j === i) return;
+      var to = panoLoc(it);
+      if (!to || to.lat == null) return;
+      if (haversineKm(from, to) > NEARBY_KM) return;
+      var yaw = ((bearingDeg(from, to) - north + 540) % 360) - 180;  // -> [-180,180]
+      spots.push({
+        id: "jump-" + j,
+        type: "scene",
+        sceneId: "s" + j,
+        pitch: -3,
+        yaw: yaw,
+        cssClass: "pano-jump",
+        createTooltipFunc: panoJumpTooltip,
+        createTooltipArgs: { label: (to.label || "") }
+      });
+    });
+    return spots;
+  }
+
+  // Show/update the location mini-map for the current panorama.
+  function updatePanoMapForItem(item) {
     var panel = document.getElementById("pano-map");
     if (!panel) return;
-    var locs = window.PANO_LOCATIONS || {};
-    var loc = locs[panoFileName(src)];
-    if (!loc || !window.L) { panel.classList.remove("show"); return; }
-
+    var loc = panoLoc(item);
+    if (!loc || loc.lat == null || !window.L) { panel.classList.remove("show"); return; }
     panel.classList.add("show");
     var labelEl = document.getElementById("pano-map-label");
     if (labelEl) labelEl.textContent = loc.label || "";
-    var zoom = loc.zoom || 13;
-
     if (!panoMap) {
-      panoMap = window.L.map("pano-map-canvas", { zoomControl: true, scrollWheelZoom: false });
+      panoMap = window.L.map("pano-map-canvas", { zoomControl: false, scrollWheelZoom: false, attributionControl: false });
       window.L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19, attribution: "© OpenStreetMap contributors"
+        maxZoom: 19, attribution: "© OpenStreetMap"
       }).addTo(panoMap);
     }
-    panoMap.setView([loc.lat, loc.lng], zoom);
-    if (panoMarker) {
-      panoMarker.setLatLng([loc.lat, loc.lng]);
-    } else {
-      // Circle marker avoids Leaflet's default-icon image path pitfalls.
-      panoMarker = window.L.circleMarker([loc.lat, loc.lng], {
-        radius: 8, color: "#fff", weight: 2, fillColor: "#c9a86a", fillOpacity: 1
-      }).addTo(panoMap);
-    }
+    panoMap.setView([loc.lat, loc.lng], loc.zoom || 13);
+    if (panoMarker) panoMarker.setLatLng([loc.lat, loc.lng]);
+    else panoMarker = window.L.circleMarker([loc.lat, loc.lng], {
+      radius: 7, color: "#fff", weight: 2, fillColor: "#c9a86a", fillOpacity: 1
+    }).addTo(panoMap);
     if (loc.label) panoMarker.bindPopup(loc.label);
-    // The map is created/shown inside a modal, so let it recompute its size.
     setTimeout(function () { try { panoMap.invalidateSize(); } catch (e) {} }, 80);
   }
 
-  function openPano(src) {
+  // Navigate to panorama `idx` (wraps around). Smooth scene fade when possible.
+  function panoGo(idx) {
+    if (!panoTour.items.length) return;
+    var n = panoTour.items.length;
+    idx = ((idx % n) + n) % n;
+    panoTour.idx = idx;
+    if (panoViewer && panoViewer.loadScene) panoViewer.loadScene("s" + idx);
+  }
+
+  function syncPanoUI() {
+    var modal = document.getElementById("pano-modal");
+    if (modal) modal.classList.toggle("pano-single", panoTour.items.length < 2);
+    updatePanoMapForItem(panoTour.items[panoTour.idx]);
+  }
+
+  // `arg` is an index into panoTour.items (number); a src string is also accepted.
+  function openPano(arg) {
     var modal = document.getElementById("pano-modal");
     var stage = document.getElementById("pano-stage");
+    var idx = 0;
+    if (typeof arg === "number") idx = arg;
+    else idx = Math.max(0, panoTour.items.findIndex(function (it) { return it.src === arg; }));
+
     // Fall back to the flat lightbox if the viewer library failed to load.
-    if (!modal || !stage || !window.pannellum) {
-      var fb = lb.items.findIndex ? lb.items.findIndex(function (it) { return panoSrc(it.folder, it.file) === src; }) : -1;
-      if (fb >= 0) openLightbox(fb);
+    if (!modal || !stage || !window.pannellum || !panoTour.items.length) {
+      if (lb.items[idx]) openLightbox(idx);
       return;
     }
     modal.classList.add("open");
     modal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    panoTour.idx = idx;
+
     if (panoViewer) { panoViewer.destroy(); panoViewer = null; }
-    panoViewer = window.pannellum.viewer(stage, {
-      type: "equirectangular",
-      panorama: src,
-      autoLoad: true,
-      autoRotate: -2,        // gentle drift so it reads as interactive on open
-      compass: false,
-      showZoomCtrl: true,
-      showFullscreenCtrl: true,
-      hfov: 110,
-      friction: 0.2
+    var scenes = {};
+    panoTour.items.forEach(function (it, i) {
+      scenes["s" + i] = { type: "equirectangular", panorama: it.src, hotSpots: panoHotSpots(i) };
     });
-    updatePanoMap(src);
+    panoViewer = window.pannellum.viewer(stage, {
+      default: {
+        firstScene: "s" + idx,
+        sceneFadeDuration: 700,
+        autoLoad: true,
+        autoRotate: -2,
+        compass: false,
+        showZoomCtrl: true,
+        showFullscreenCtrl: true,
+        hfov: 110,
+        friction: 0.2
+      },
+      scenes: scenes
+    });
+    panoViewer.on("scenechange", function (sceneId) {
+      var i = parseInt(String(sceneId).slice(1), 10);
+      if (!isNaN(i)) panoTour.idx = i;
+      updatePanoMapForItem(panoTour.items[panoTour.idx]);
+    });
+    syncPanoUI();
   }
+
   function closePano() {
     var modal = document.getElementById("pano-modal");
     if (!modal) return;
-    modal.classList.remove("open");
+    modal.classList.remove("open", "near-left", "near-right");
     modal.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
     if (panoViewer) { panoViewer.destroy(); panoViewer = null; }
     var panel = document.getElementById("pano-map");
     if (panel) panel.classList.remove("show");
   }
+
   function initPanoControls() {
     var modal = document.getElementById("pano-modal");
     if (!modal) return;
     modal.querySelector(".pano-close").addEventListener("click", closePano);
+    var prev = modal.querySelector(".pano-prev");
+    var next = modal.querySelector(".pano-next");
+    if (prev) prev.addEventListener("click", function (e) { e.stopPropagation(); panoGo(panoTour.idx - 1); });
+    if (next) next.addEventListener("click", function (e) { e.stopPropagation(); panoGo(panoTour.idx + 1); });
+
+    // Reveal the prev/next arrows only when the pointer nears the left/right edge.
+    // Capture phase so it fires even though Pannellum handles pointer events on its canvas.
+    modal.addEventListener("mousemove", function (e) {
+      var w = modal.clientWidth, edge = Math.min(170, w * 0.18);
+      modal.classList.toggle("near-left", e.clientX < edge);
+      modal.classList.toggle("near-right", e.clientX > w - edge);
+    }, true);
+    modal.addEventListener("mouseleave", function () {
+      modal.classList.remove("near-left", "near-right");
+    });
+
     document.addEventListener("keydown", function (e) {
-      if (modal.classList.contains("open") && e.key === "Escape") closePano();
+      if (!modal.classList.contains("open")) return;
+      if (e.key === "Escape") closePano();
+      else if (e.key === "ArrowLeft") panoGo(panoTour.idx - 1);
+      else if (e.key === "ArrowRight") panoGo(panoTour.idx + 1);
     });
   }
 

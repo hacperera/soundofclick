@@ -530,12 +530,11 @@ picture { display: contents; }
   font-size: 12px; letter-spacing: .14em; color: var(--text-dim);
   pointer-events: none;
 }
-/* Move Pannellum's zoom (+/-) and fullscreen controls to the bottom-right and
-   restyle them to match the home page hero fullscreen button. The zoom group is
-   a wrapper holding the + and - as stacked children, so we restyle the shared
-   .pnlm-controls box rather than force a fixed size that would squash them. */
+/* Pannellum's zoom (+/-) and fullscreen controls sit bottom-LEFT (the map now
+   occupies bottom-right). The zoom group is a wrapper holding + and - stacked,
+   so we restyle the shared .pnlm-controls box rather than force a fixed size. */
 .pano-modal .pnlm-controls-container {
-  top: auto; bottom: 22px; right: 22px; left: auto;
+  top: auto; bottom: 22px; left: 22px; right: auto;
   display: flex; gap: 8px; align-items: flex-end;
 }
 .pano-modal .pnlm-controls {
@@ -546,28 +545,70 @@ picture { display: contents; }
   transition: background .3s ease, border-color .3s ease;
 }
 .pano-modal .pnlm-controls:hover { background: rgba(0,0,0,.55); border-color: var(--accent); }
-/* Location mini-map docked top-left; only shown when the photo has coordinates */
+
+/* Prev/next panorama arrows — hidden until the pointer nears the left/right edge */
+.pano-nav {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 4;
+  width: 54px; height: 54px; border-radius: 50%;
+  background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.3);
+  color: #fff; font-size: 30px; line-height: 1; cursor: pointer;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s ease, background .25s ease, border-color .25s ease;
+}
+.pano-prev { left: 18px; }
+.pano-next { right: 18px; }
+.pano-nav:hover { background: rgba(0,0,0,.7); border-color: var(--accent); }
+.pano-modal.near-left .pano-prev,
+.pano-modal.near-right .pano-next { opacity: .9; pointer-events: auto; }
+.pano-modal.pano-single .pano-nav { display: none; }
+
+/* Location mini-map docked bottom-RIGHT; only shown when a location is known */
 .pano-map {
-  position: absolute; top: 22px; left: 22px; z-index: 3;
-  width: 300px; max-width: 44vw;
-  display: none;
+  position: absolute; bottom: 22px; right: 22px; z-index: 3;
+  width: 220px; max-width: 44vw;
+  display: none; overflow: hidden; border-radius: 6px;
   background: rgba(0,0,0,.35);
   border: 1px solid rgba(255,255,255,.28);
   backdrop-filter: blur(6px);
   box-shadow: 0 18px 50px rgba(0,0,0,.5);
 }
 .pano-map.show { display: block; }
-.pano-map-canvas { width: 100%; height: 200px; background: #11161d; }
+.pano-map-canvas { width: 100%; height: 150px; background: #11161d; }
 .pano-map-label {
-  padding: 9px 12px;
-  font-size: 12px; letter-spacing: .04em; color: var(--text);
+  padding: 8px 11px;
+  font-size: 11px; letter-spacing: .04em; color: var(--text);
   border-top: 1px solid rgba(255,255,255,.14);
 }
-/* Keep Leaflet tiles/controls below the close button and readable on dark */
 .pano-map .leaflet-control-attribution { font-size: 9px; }
+
+/* Transparent directional "jump to nearby panorama" hotspot */
+.pano-modal .pano-jump { background: none !important; }
+.pano-jump-ico {
+  position: absolute; top: 50%; left: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px; border-radius: 50%;
+  font-size: 20px; color: #fff;
+  background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.55);
+  backdrop-filter: blur(3px);
+  transform: translate(-50%, -50%);
+  transition: background .25s ease, transform .25s ease;
+  cursor: pointer;
+}
+.pano-jump:hover .pano-jump-ico { background: var(--accent); color: #000; transform: translate(-50%,-50%) scale(1.12); }
+.pano-jump-label {
+  position: absolute; left: 50%; top: 100%; transform: translateX(-50%);
+  margin-top: 6px; white-space: nowrap;
+  font-size: 11px; letter-spacing: .06em; color: #fff;
+  background: rgba(0,0,0,.55); padding: 2px 8px; border-radius: 10px;
+  opacity: 0; transition: opacity .25s ease; pointer-events: none;
+}
+.pano-jump:hover .pano-jump-label { opacity: 1; }
+
 @media (max-width: 640px) {
-  .pano-map { width: 200px; top: 16px; left: 16px; }
-  .pano-map-canvas { height: 140px; }
+  .pano-map { width: 150px; bottom: 16px; right: 16px; }
+  .pano-map-canvas { height: 110px; }
+  .pano-nav { width: 44px; height: 44px; font-size: 24px; }
+  .pano-hint { display: none; }
 }
 
 /* ============================================================
