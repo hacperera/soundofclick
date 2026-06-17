@@ -707,6 +707,35 @@ form input:focus, form select:focus, form textarea:focus { outline: none; border
 form textarea { resize: vertical; min-height: 140px; }
 .form-note { font-size: 13px; color: var(--text-faint); margin-top: 16px; }
 
+/* ---------- Newsletter ---------- */
+.newsletter h2 { max-width: 920px; margin-left: auto; margin-right: auto; }
+.newsletter-form {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  max-width: 620px; margin: 32px auto 0;
+}
+.newsletter-form .newsletter-input {
+  width: auto; flex: 1 1 280px; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); color: var(--text);
+  padding: 15px 18px; font-family: var(--sans); font-size: 15px;
+  transition: border-color .3s ease;
+}
+.newsletter-form .newsletter-input:focus { outline: none; border-color: var(--accent); }
+.newsletter-form .newsletter-input::placeholder { color: var(--text-faint); }
+.newsletter-btn { flex: 0 0 auto; }
+.newsletter-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.newsletter-msg { min-height: 20px; margin-top: 16px; font-size: 14px; color: var(--text-dim); }
+.newsletter-msg.ok { color: var(--accent); }
+.newsletter-msg.err { color: #e08a8a; }
+.newsletter-social { display: flex; gap: 14px; justify-content: center; margin-top: 28px; }
+.newsletter-social a {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--surface); border: 1px solid var(--line); color: var(--text);
+  transition: background .25s ease, color .25s ease, border-color .25s ease;
+}
+.newsletter-social a:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.newsletter-social svg { width: 18px; height: 18px; fill: currentColor; }
+
 /* ============================================================
    Footer
    ============================================================ */

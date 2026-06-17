@@ -863,6 +863,34 @@
     });
   }
 
+  /* ---------- Newsletter (Netlify Forms) ---------- */
+  function initNewsletter() {
+    var form = document.getElementById("newsletter-form");
+    if (!form) return;
+    var msg = document.getElementById("newsletter-msg");
+    function say(text, cls) {
+      if (!msg) return;
+      msg.textContent = text;
+      msg.className = "newsletter-msg" + (cls ? " " + cls : "");
+    }
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var body = new URLSearchParams(new FormData(form)).toString();
+      say("Subscribing…");
+      fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body
+      }).then(function (r) {
+        if (!r.ok) throw new Error("submit failed");
+        form.reset();
+        say("Thanks — you're subscribed! 🎉", "ok");
+      }).catch(function () {
+        say("Sorry, that didn't go through. Please try again.", "err");
+      });
+    });
+  }
+
   /* ---------- Scroll reveal ---------- */
   var io;
   function getObserver() {
@@ -895,6 +923,7 @@
     initSeries();
     initLightboxControls();
     initPanoControls();
+    initNewsletter();
     initReveal();
     var yr = document.getElementById("year");
     if (yr) yr.textContent = new Date().getFullYear();
