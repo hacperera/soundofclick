@@ -331,6 +331,152 @@ def build_media(categories):
     return media
 
 
+# ----------------------------------------------------------------------------
+# Per-photo metadata extraction (EXIF + IPTC + GPS) -> js/photo-meta.auto.js
+# ----------------------------------------------------------------------------
+def _rat(x):
+    try:
+        return float(x)
+    except Exception:
+        try:
+            return x.numerator / x.denominator
+        except Exception:
+            return None
+
+
+def _fmt_shutter(v):
+    x = _rat(v)
+    if x is None:
+        return None
+    if x >= 1:
+        return "%g s" % x
+    return "1/%d s" % round(1.0 / x)
+
+
+def _clean(s):
+    """Trim whitespace and null bytes that EXIF/IPTC strings sometimes carry."""
+    if s is None:
+        return None
+    s = str(s).replace("\x00", "").strip()
+    return s or None
+
+
+def extract_meta(path):
+    """Read camera/exposure (EXIF), GPS, and title/caption/keywords (IPTC) from a photo."""
+    meta = {}
+    try:
+        im = Image.open(path)
+    except Exception:
+        return meta
+
+    # --- EXIF: camera, lens, exposure, date ---
+    try:
+        ex = im._getexif() or {}
+        d = {ExifTags.TAGS.get(k, k): v for k, v in ex.items()}
+        cam = _clean(d.get("Model")) or _clean(d.get("Make"))
+        if cam:
+            meta["camera"] = cam
+        lens = _clean(d.get("LensModel") or d.get("LensInfo"))
+        if lens:
+            meta["lens"] = lens
+        if d.get("FNumber") is not None:
+            a = _rat(d["FNumber"])
+            if a:
+                meta["aperture"] = "f/%g" % a
+        if d.get("ExposureTime") is not None:
+            s = _fmt_shutter(d["ExposureTime"])
+            if s:
+                meta["shutter"] = s
+        iso = d.get("ISOSpeedRatings") or d.get("PhotographicSensitivity")
+        if isinstance(iso, (list, tuple)):
+            iso = iso[0] if iso else None
+        if iso:
+            try:
+                meta["iso"] = "ISO %d" % int(iso)
+            except Exception:
+                pass
+        if d.get("FocalLength") is not None:
+            f = _rat(d["FocalLength"])
+            if f:
+                meta["focal"] = "%g mm" % round(f)
+        dt = d.get("DateTimeOriginal") or d.get("DateTime")
+        if dt:
+            meta["date"] = str(dt)[:10].replace(":", "-")
+    except Exception:
+        pass
+
+    # --- GPS ---
+    try:
+        g = gps_of(im)
+        if g:
+            meta["lat"] = g["lat"]
+            meta["lng"] = g["lng"]
+    except Exception:
+        pass
+
+    # --- IPTC: title, caption, keywords ---
+    try:
+        from PIL import IptcImagePlugin
+        iptc = IptcImagePlugin.getiptcinfo(im) or {}
+
+        def _dec(v):
+            return _clean(v.decode("utf-8", "replace") if isinstance(v, bytes) else v)
+
+        meta_title = _dec(iptc.get((2, 5))) or _dec(iptc.get((2, 105)))
+        if meta_title:
+            meta["title"] = meta_title
+        if _dec(iptc.get((2, 120))):
+            meta["caption"] = _dec(iptc[(2, 120)])
+        kw = iptc.get((2, 25))
+        if kw:
+            items = kw if isinstance(kw, (list, tuple)) else [kw]
+            kws = [_dec(k) for k in items if _dec(k)]
+            if kws:
+                meta["keywords"] = kws
+        for tag, field in [((2, 90), "city"), ((2, 101), "country"), ((2, 92), "location")]:
+            if _dec(iptc.get(tag)):
+                meta[field] = _dec(iptc[tag])
+    except Exception:
+        pass
+
+    return meta
+
+
+def build_photo_meta(categories):
+    """Extract metadata for every gallery photo (incremental); return {folder/file: meta}."""
+    if not _PIL:
+        return {}
+    cache_path = os.path.join(HERE, ".meta-cache.json")
+    cache = {}
+    if os.path.exists(cache_path):
+        try:
+            with open(cache_path, encoding="utf-8") as fh:
+                cache = json.load(fh)
+        except Exception:
+            cache = {}
+    meta = {}
+    for cat in categories:
+        for file in cat["images"]:
+            key = cat["folder"] + "/" + file
+            path = os.path.join(HERE, cat["folder"], file)
+            try:
+                mtime = os.path.getmtime(path)
+            except OSError:
+                continue
+            cached = cache.get(key)
+            if cached and cached.get("mtime") == mtime:
+                if cached.get("meta"):
+                    meta[key] = cached["meta"]
+                continue
+            m = extract_meta(path)
+            cache[key] = {"mtime": mtime, "meta": m}
+            if m:
+                meta[key] = m
+    with open(cache_path, "w", encoding="utf-8") as fh:
+        json.dump(cache, fh)
+    return meta
+
+
 def main():
     folders = sorted(
         d for d in os.listdir(HERE)
@@ -395,9 +541,42 @@ def main():
     with open(os.path.join(HERE, "js", "images.js"), "w", encoding="utf-8") as fh:
         fh.write(out)
 
+    # --- Per-photo metadata (auto layer from EXIF/IPTC/GPS) ---
+    photo_meta = build_photo_meta(categories)
+    with open(os.path.join(HERE, "js", "photo-meta.auto.js"), "w", encoding="utf-8") as fh:
+        fh.write(
+            "// AUTO-GENERATED by generate_manifest.py — do not edit by hand.\n"
+            "// Per-photo metadata read from EXIF / IPTC / GPS. Your manual edits\n"
+            "// (stories, collections, corrections) go in photo-meta.js and win over this.\n"
+            "window.PHOTO_META_AUTO = " + json.dumps(photo_meta, ensure_ascii=False) + ";\n"
+        )
+
+    # --- Manual metadata layer: create once, never overwrite ---
+    manual_path = os.path.join(HERE, "js", "photo-meta.js")
+    if not os.path.exists(manual_path):
+        with open(manual_path, "w", encoding="utf-8") as fh:
+            fh.write(
+                "/* Manual per-photo metadata — your edits WIN over the auto layer\n"
+                "   (photo-meta.auto.js). Keyed by \"folder/filename\". Edit by hand or\n"
+                "   via meta-editor.html. Safe to re-run the build; this file is never\n"
+                "   overwritten.\n"
+                "   Example:\n"
+                "   window.PHOTO_META = {\n"
+                "     \"photos_Landscape/_E2A7174.jpg\": {\n"
+                "       title: \"Dawn over the ridge\",\n"
+                "       collection: \"Highlands\",\n"
+                "       story: \"The story behind the shot…\",\n"
+                "       location: \"Knuckles Range, Sri Lanka\", country: \"Sri Lanka\",\n"
+                "       featured: true\n"
+                "     }\n"
+                "   }; */\n"
+                "window.PHOTO_META = {};\n"
+            )
+
     print(f"Wrote js/images.js — {len(categories)} categories, {total} images, "
           f"{len(videos['portrait'])} portrait + {len(videos['landscape'])} landscape videos, "
           f"{len(prints)} prints.")
+    print(f"  photo metadata: {len(photo_meta)} photos carry EXIF/IPTC/GPS data.")
 
 
 if __name__ == "__main__":

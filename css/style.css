@@ -582,6 +582,26 @@ picture { display: contents; }
   font-size: 12px; letter-spacing: .14em; color: var(--text-dim);
   text-shadow: 0 1px 6px rgba(0,0,0,.9); pointer-events: none;
 }
+/* EXIF + location panel in the lightbox (shown when a photo has metadata) */
+.lb-info {
+  position: absolute; left: 0; right: 0; bottom: 40px; z-index: 1;
+  text-align: center; padding: 0 16px; pointer-events: none;
+}
+.lb-info:empty { display: none; }
+.lb-info .lb-title {
+  font-family: var(--serif); font-size: clamp(18px, 2.4vw, 24px); color: #fff;
+  margin-bottom: 4px; text-shadow: 0 2px 12px rgba(0,0,0,.95);
+}
+.lb-info .lb-loc {
+  font-size: 13px; letter-spacing: .06em; color: var(--accent); margin-bottom: 7px;
+  text-shadow: 0 1px 10px rgba(0,0,0,.95);
+}
+.lb-info .lb-loc::before { content: "📍 "; }
+.lb-info .lb-exif {
+  font-size: 12px; letter-spacing: .06em; color: #ddd9d1;
+  text-shadow: 0 1px 10px rgba(0,0,0,.95);
+}
+.lb-info .lb-exif::before { content: "📷  "; }
 
 /* ---------- 360° panorama viewer ---------- */
 .pano-modal {

@@ -81,6 +81,24 @@
     return pic;
   }
 
+  /* ---------- Per-photo metadata (auto EXIF/IPTC layer + manual overrides) ----------
+     PHOTO_META_AUTO (generated from EXIF/IPTC/GPS) is merged with PHOTO_META
+     (hand/editor-managed); manual fields win. Keyed by "folder/file". */
+  var PM_AUTO = window.PHOTO_META_AUTO || {};
+  var PM_MANUAL = window.PHOTO_META || {};
+  function photoMeta(folder, file) {
+    var key = folder + "/" + file;
+    var a = PM_AUTO[key] || {}, m = PM_MANUAL[key] || {}, out = {}, k;
+    for (k in a) out[k] = a[k];
+    for (k in m) out[k] = m[k];   // manual overrides auto
+    return out;
+  }
+  function escHtml(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+    });
+  }
+
   // Flatten manifest into a single list of {folder, file, src, cat}.
   function allImages() {
     var out = [];
@@ -635,6 +653,18 @@
     }
     var meta = document.getElementById("lb-meta");
     if (meta) meta.textContent = item.cat + "  ·  " + (lb.idx + 1) + " / " + lb.items.length;
+
+    // EXIF + location panel (from merged photo metadata)
+    var info = document.getElementById("lb-info");
+    if (info) {
+      var m = photoMeta(item.folder, item.file), html = "";
+      if (m.title) html += '<div class="lb-title">' + escHtml(m.title) + '</div>';
+      var loc = m.location || [m.city, m.country].filter(Boolean).join(", ");
+      if (loc) html += '<div class="lb-loc">' + escHtml(loc) + '</div>';
+      var exif = [m.camera, m.lens, m.focal, m.aperture, m.shutter, m.iso].filter(Boolean);
+      if (exif.length) html += '<div class="lb-exif">' + escHtml(exif.join("   ·   ")) + '</div>';
+      info.innerHTML = html;
+    }
   }
   function moveLightbox(d) {
     lb.idx = (lb.idx + d + lb.items.length) % lb.items.length;
