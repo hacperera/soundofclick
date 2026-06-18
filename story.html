@@ -4,7 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Photo Story — Lio Photography | Chaminda Perera</title>
-  <meta name="description" content="The story behind a photograph by Chaminda Perera — location, camera settings, and the moment it was made.">
+  <meta name="description" content="The story behind a photograph by Chaminda Perera — location, camera settings, and the moment it was made."
+  <link rel="canonical" href="https://dashing-pudding-2c0a43.netlify.app/story">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Lio Photography">
+  <meta property="og:title" content="Photo Story — Lio Photography | Chaminda Perera">
+  <meta property="og:description" content="The story behind a photograph by Chaminda Perera — location, camera settings, and the moment it was made.">
+  <meta property="og:url" content="https://dashing-pudding-2c0a43.netlify.app/story">
+  <meta property="og:image" content="https://dashing-pudding-2c0a43.netlify.app/photos_Landscape/_web/Untitled_HDR-2-Edit-1080.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Photo Story — Lio Photography | Chaminda Perera">
+  <meta name="twitter:description" content="The story behind a photograph by Chaminda Perera — location, camera settings, and the moment it was made.">
+  <meta name="twitter:image" content="https://dashing-pudding-2c0a43.netlify.app/photos_Landscape/_web/Untitled_HDR-2-Edit-1080.jpg">
+>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -120,6 +132,27 @@
     if((lat==null||lng==null) && PANO[file]){ lat=PANO[file].lat; lng=PANO[file].lng; if(!loc) loc=PANO[file].label; }
     var title = m.title || loc || cat.title + " photograph";
     document.title = title + " — Lio Photography";
+
+    // SEO: per-photo share tags + structured data
+    (function(){
+      var fullImg = new URL(bestSrc(folder,file,1280,"jpg"), location.href).href;
+      var desc = m.story ? String(m.story).slice(0,180)
+                         : ("A photograph from " + (loc || cat.title) + " by Chaminda Perera.");
+      function setAll(sel, val){ Array.prototype.forEach.call(document.querySelectorAll(sel), function(e){ e.setAttribute("content", val); }); }
+      setAll('meta[property="og:title"],meta[name="twitter:title"]', title);
+      setAll('meta[property="og:description"],meta[name="twitter:description"]', desc);
+      setAll('meta[property="og:image"],meta[name="twitter:image"]', fullImg);
+      setAll('meta[property="og:url"]', location.href);
+      setAll('meta[property="og:type"]', "article");
+      var can = document.querySelector('link[rel="canonical"]'); if(can) can.href = location.href;
+      var ld = { "@context":"https://schema.org","@type":"ImageObject","name":title,"contentUrl":fullImg,
+                 "creator":{"@type":"Person","name":"Chaminda Perera","alternateName":"Lio Photography"} };
+      if(m.story) ld.description = m.story;
+      if(loc) ld.contentLocation = { "@type":"Place","name":loc };
+      if(m.date) ld.dateCreated = m.date;
+      if(m.keywords) ld.keywords = (m.keywords||[]).join(", ");
+      var sc = document.createElement("script"); sc.type = "application/ld+json"; sc.textContent = JSON.stringify(ld); document.head.appendChild(sc);
+    })();
 
     // Hero — 360 panoramas get the live viewer; everything else a large image
     var hero = document.getElementById("story-hero");

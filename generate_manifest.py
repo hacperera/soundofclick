@@ -41,6 +41,8 @@ PANO_THUMB = 640                          # flat thumbnail for the 360 gallery t
 STD_FMTS = [("avif", "AVIF", 55), ("webp", "WEBP", 80), ("jpg", "JPEG", 82)]
 PANO_FMTS = [("webp", "WEBP", 82), ("jpg", "JPEG", 85)]   # no AVIF for the viewer texture
 CACHE_FILE = ".media-cache.json"
+# Public site URL — change this to your custom domain when it's set.
+SITE_URL = "https://dashing-pudding-2c0a43.netlify.app"
 
 # Friendly display names + ordering for known folders.
 # Any photos_* folder not listed here is still included automatically,
@@ -477,6 +479,26 @@ def build_photo_meta(categories):
     return meta
 
 
+def write_sitemap(categories):
+    """Write sitemap.xml (main pages + a story page per photo) and robots.txt."""
+    from urllib.parse import quote
+    urls = ["/", "/gallery", "/map", "/about", "/contact", "/blog"]
+    for cat in categories:
+        for f in cat["images"]:
+            # Match the encodeURIComponent form used by the site's internal links.
+            urls.append("/story.html?photo=" + quote(cat["folder"] + "/" + f, safe="()'!*~"))
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for u in urls:
+        lines.append("  <url><loc>%s%s</loc></url>" % (SITE_URL, u))
+    lines.append("</urlset>")
+    with open(os.path.join(HERE, "sitemap.xml"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
+    with open(os.path.join(HERE, "robots.txt"), "w", encoding="utf-8") as fh:
+        fh.write("User-agent: *\nAllow: /\n\nSitemap: %s/sitemap.xml\n" % SITE_URL)
+    return len(urls)
+
+
 def main():
     folders = sorted(
         d for d in os.listdir(HERE)
@@ -577,6 +599,9 @@ def main():
           f"{len(videos['portrait'])} portrait + {len(videos['landscape'])} landscape videos, "
           f"{len(prints)} prints.")
     print(f"  photo metadata: {len(photo_meta)} photos carry EXIF/IPTC/GPS data.")
+
+    n = write_sitemap(categories)
+    print(f"  wrote sitemap.xml ({n} URLs) + robots.txt.")
 
 
 if __name__ == "__main__":

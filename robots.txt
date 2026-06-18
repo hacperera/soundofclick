@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dashing-pudding-2c0a43.netlify.app/sitemap.xml
