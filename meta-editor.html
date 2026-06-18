@@ -144,10 +144,17 @@
     Object.keys(folders).sort().forEach(function(f){
       var o=document.createElement("option"); o.value=f; o.textContent=f; folderSel.appendChild(o);
     });
+    // Suggested collections (shown as a pick-list) + any already in use.
+    var SUGGESTED_COLLECTIONS = [
+      "Night Skies", "Golden Hours", "Cityscapes", "Desert Adventures", "Coast & Sea",
+      "Highlands & Rails", "From Above", "Fine Art", "Faces", "On the Wing",
+      "Sri Lanka", "Saudi Arabia", "Kuwait", "Travel Diaries"
+    ];
     var collections = {};
+    SUGGESTED_COLLECTIONS.forEach(function(c){ collections[c]=1; });
     photos.forEach(function(p){ var m=merged(p.key); if(m.collection) collections[m.collection]=1; });
     var dl = document.createElement("datalist"); dl.id="collections";
-    Object.keys(collections).forEach(function(c){ var o=document.createElement("option"); o.value=c; dl.appendChild(o); });
+    Object.keys(collections).sort().forEach(function(c){ var o=document.createElement("option"); o.value=c; dl.appendChild(o); });
     document.body.appendChild(dl);
 
     function esc(s){ return String(s==null?"":s); }
