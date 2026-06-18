@@ -1,5 +1,5 @@
 /* ============================================================
-   hacpix — blog posts
+   Lio Photography — blog posts
    Edit this file to add or change posts (newest first).
    Each post: { slug, title, category, read, date, thumb, excerpt, body }
    - slug:    unique id used in the URL (post.html?slug=...)

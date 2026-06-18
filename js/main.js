@@ -1,5 +1,5 @@
 /* ============================================================
-   hacpix — site behaviour
+   Lio Photography — site behaviour
    Depends on js/images.js (window.GALLERY_DATA)
    ============================================================ */
 (function () {
@@ -506,7 +506,7 @@
     var post = POSTS[idx];
     if (!post) return;
 
-    document.title = post.title + " — hacpix | Chaminda Perera";
+    document.title = post.title + " — Lio Photography | Chaminda Perera";
     var set = function (id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt; };
     set("post-cat", post.category);
     set("post-title", post.title);
@@ -549,7 +549,7 @@
     var countEl = document.getElementById("series-count");
     if (titleEl) titleEl.textContent = cat.title;
     if (countEl) countEl.textContent = cat.images.length + " photograph" + (cat.images.length > 1 ? "s" : "");
-    document.title = cat.title + " — hacpix | Chaminda Perera";
+    document.title = cat.title + " — Lio Photography | Chaminda Perera";
 
     // Build "next series" link for continuous browsing
     var nextLink = document.getElementById("series-next");
