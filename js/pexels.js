@@ -18,6 +18,7 @@ window.PEXELS = {
     { id: "1718259", views: "1.3M",  page: "https://www.pexels.com/photo/standing-man-beside-camel-on-desert-1718259/",      img: "https://images.pexels.com/photos/1718259/pexels-photo-1718259.jpeg" },
     { id: "2313726", views: "1.2M",  page: "https://www.pexels.com/photo/beach-near-dock-2313726/",                          img: "https://images.pexels.com/photos/2313726/pexels-photo-2313726.jpeg" },
     { id: "2418338", views: "797K",  page: "https://www.pexels.com/photo/woman-wearing-pink-top-2418338/",                   img: "https://images.pexels.com/photos/2418338/pexels-photo-2418338.jpeg" },
-    { id: "1633689", views: "648K",  page: "https://www.pexels.com/photo/gray-rock-near-wooden-dock-1633689/",               img: "https://images.pexels.com/photos/1633689/pexels-photo-1633689.jpeg" }
+    { id: "1633689", views: "648K",  page: "https://www.pexels.com/photo/gray-rock-near-wooden-dock-1633689/",               img: "https://images.pexels.com/photos/1633689/pexels-photo-1633689.jpeg" },
+    { id: "2848389", views: "12.8K", page: "https://www.pexels.com/photo/ambegoda-art-astronomy-astrophoto-2848389/",        img: "https://images.pexels.com/photos/2848389/pexels-photo-2848389.jpeg" }
   ]
 };
