@@ -377,7 +377,7 @@
 
     var PD = window.PRINTS_DATA;
     var curated = (PD && PD.images && PD.images.length)
-      ? shuffle(PD.images.map(function (f) { return PD.folder + "/" + encodeURIComponent(f); }))
+      ? shuffle(PD.images.map(function (f) { return bestSrc(PD.folder, f, 1280, "webp"); }))
       : [];
     var ci = 0;
 
@@ -393,7 +393,9 @@
       var key = row.dataset.prints;
       for (var i = 0; i < 3; i++) {
         var src = null;
-        if (ci < curated.length) src = curated[ci++];
+        // When real prints exist, cycle through them so every slot is a print
+        // (no gallery fallback mixed in); otherwise fall back to gallery photos.
+        if (curated.length) src = curated[ci++ % curated.length];
         else if (fallback[key] && fallback[key].length) src = fallback[key].shift();
         if (!src) continue;
         var fig = document.createElement("figure");
