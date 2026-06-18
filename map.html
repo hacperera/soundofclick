@@ -130,33 +130,43 @@
 
     if(!points.length){ document.getElementById("map-empty").style.display="block"; return; }
 
+    // Lightbox helpers
+    var lb = document.getElementById("map-lb"), lbImg = document.getElementById("map-lb-img"), lbInfo = document.getElementById("map-lb-info");
+    function openLb(p){
+      lbImg.src = p.full;
+      var info = "";
+      if(p.title) info += '<div class="lb-title">'+esc(p.title)+'</div>';
+      if(p.label) info += '<div class="lb-loc">'+esc(p.label)+'</div>';
+      if(p.exif)  info += '<div class="lb-exif">'+esc(p.exif)+'</div>';
+      lbInfo.innerHTML = info;
+      lb.classList.add("open"); document.body.style.overflow="hidden";
+    }
+    function closeLb(){ lb.classList.remove("open"); lbImg.removeAttribute("src"); document.body.style.overflow=""; }
+    lb.querySelector(".lb-close").addEventListener("click", closeLb);
+    lb.addEventListener("click", function(e){ if(e.target===lb) closeLb(); });
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape" && lb.classList.contains("open")) closeLb(); });
+
     var cluster = L.markerClusterGroup({ maxClusterRadius: 45 });
     var bounds = [];
     points.forEach(function(p){
       var icon = L.divIcon({ className:"", html:'<div class="map-pin"></div>', iconSize:[14,14], iconAnchor:[7,7] });
       var mk = L.marker([p.lat,p.lng], { icon:icon, title:p.title });
-      var html = '<div class="map-pop"><img src="'+esc(p.thumb)+'" data-full="'+esc(p.full)+'" alt="">'+
+      // Build popup as a real element so we can attach the click handler directly
+      // (Leaflet stops popup clicks from bubbling to document).
+      var el = document.createElement("div");
+      el.className = "map-pop";
+      el.innerHTML = '<img src="'+esc(p.thumb)+'" alt="View larger">'+
                  '<div class="p"><div class="t">'+esc(p.title)+'</div>'+
                  (p.label?'<div class="l">'+esc(p.label)+'</div>':'')+
-                 (p.exif?'<div class="e">'+esc(p.exif)+'</div>':'')+'</div></div>';
-      mk.bindPopup(html, { closeButton:true });
+                 (p.exif?'<div class="e">'+esc(p.exif)+'</div>':'')+'</div>';
+      el.querySelector("img").addEventListener("click", function(){ openLb(p); });
+      mk.bindPopup(el, { closeButton:true, minWidth:240 });
       cluster.addLayer(mk);
       bounds.push([p.lat,p.lng]);
     });
     map.addLayer(cluster);
     if(bounds.length>1) map.fitBounds(bounds, { padding:[50,50], maxZoom:9 });
     else map.setView(bounds[0], 8);
-
-    // Open the lightbox when a popup thumbnail is clicked
-    var lb = document.getElementById("map-lb"), lbImg = document.getElementById("map-lb-img"), lbInfo = document.getElementById("map-lb-info");
-    document.addEventListener("click", function(e){
-      var img = e.target.closest && e.target.closest(".map-pop img");
-      if(img){ lbImg.src = img.getAttribute("data-full"); lbInfo.innerHTML = ""; lb.classList.add("open"); document.body.style.overflow="hidden"; }
-    });
-    function close(){ lb.classList.remove("open"); document.body.style.overflow=""; }
-    lb.querySelector(".lb-close").addEventListener("click", close);
-    lb.addEventListener("click", function(e){ if(e.target===lb) close(); });
-    document.addEventListener("keydown", function(e){ if(e.key==="Escape" && lb.classList.contains("open")) close(); });
 
     var yr=document.getElementById("year"); if(yr) yr.textContent=new Date().getFullYear();
   })();
