@@ -31,14 +31,8 @@
     #map-lb #map-lb-img { max-width: 94vw; max-height: 90vh; width: auto; height: auto; }
     /* 360 viewer above Leaflet too */
     #map-pano { z-index: 3200; }
-    /* Reset-to-full-view control */
-    .map-reset {
-      width: 36px; height: 36px; margin: 10px; cursor: pointer;
-      background: #15151a; color: var(--text); border: 1px solid var(--line);
-      border-radius: 6px; font-size: 17px; line-height: 1;
-      box-shadow: 0 2px 10px rgba(0,0,0,.45); transition: color .2s, border-color .2s;
-    }
-    .map-reset:hover { color: var(--accent); border-color: var(--accent); }
+    /* Reset button rendered as a third zoom-control button (+ / - / 🌍) */
+    .leaflet-control-zoom-reset { font-size: 15px; text-align: center; }
   </style>
 </head>
 <body>
@@ -212,19 +206,15 @@
     }
     resetView();
 
-    // "Reset to full view" button (top-right)
-    var ResetCtl = L.Control.extend({
-      options: { position: "topright" },
-      onAdd: function(){
-        var b = L.DomUtil.create("button", "map-reset");
-        b.type = "button"; b.title = "Reset to full view"; b.setAttribute("aria-label","Reset to full view");
-        b.innerHTML = "&#127758;";   // 🌍
-        L.DomEvent.on(b, "click", function(e){ L.DomEvent.stop(e); resetView(); });
-        L.DomEvent.disableClickPropagation(b);
-        return b;
-      }
-    });
-    map.addControl(new ResetCtl());
+    // Add a third button to the zoom control: + / - / 🌍 (reset to full view)
+    var zoomBar = document.querySelector("#map .leaflet-control-zoom");
+    if(zoomBar){
+      var rb = L.DomUtil.create("a", "leaflet-control-zoom-reset", zoomBar);
+      rb.href = "#"; rb.title = "Reset to full view";
+      rb.setAttribute("role","button"); rb.setAttribute("aria-label","Reset to full view");
+      rb.innerHTML = "&#127758;";   // 🌍
+      L.DomEvent.on(rb, "click", function(e){ L.DomEvent.stop(e); resetView(); });
+    }
 
     var yr=document.getElementById("year"); if(yr) yr.textContent=new Date().getFullYear();
   })();
