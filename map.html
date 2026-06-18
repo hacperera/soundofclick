@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Map — Lio Photography | Chaminda Perera</title>
+  <meta name="description" content="An interactive map of where Chaminda Perera's photographs were captured — across deserts, cities and night skies.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .map-wrap { padding: 0 0 clamp(60px,10vh,120px); }
+    #map { height: clamp(520px, 78vh, 920px); background: #11161d; }
+    .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: #15151a; color: var(--text); box-shadow: 0 14px 40px rgba(0,0,0,.6); }
+    .leaflet-popup-content { margin: 0; width: 240px !important; }
+    .map-pop img { width: 100%; aspect-ratio: 3/2; object-fit: cover; display: block; cursor: zoom-in; }
+    .map-pop .p { padding: 10px 12px 12px; }
+    .map-pop .t { font-family: var(--serif); font-size: 18px; color: #fff; line-height: 1.2; }
+    .map-pop .l { font-size: 12px; color: var(--accent); margin-top: 3px; }
+    .map-pop .e { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+    .map-pin { background: var(--accent); width: 14px; height: 14px; border-radius: 50%; border: 2px solid #1a1a1a; box-shadow: 0 0 0 3px rgba(201,168,106,.35); }
+    .map-empty { text-align: center; color: var(--text-dim); padding: 40px 20px; }
+    #map-lb .lb-close { top: 22px; right: 26px; }
+  </style>
+</head>
+<body>
+
+  <header class="nav solid">
+    <div class="wrap">
+      <a href="index.html" class="brand">Lio <b>Photography</b></a>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="map.html" class="active">Map</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="gallery-intro">
+    <div class="wrap">
+      <p class="eyebrow">Where I've shot</p>
+      <div class="section-head"><h2>Photo map.</h2><p>Every pin is a place I've photographed — <span id="map-count"></span>. Click a marker to see the image.</p></div>
+    </div>
+  </section>
+
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div class="map-empty" id="map-empty" style="display:none">
+      No geotagged photos yet. Add locations (latitude/longitude) in the metadata editor and they'll appear here.
+    </div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="map-lb" aria-hidden="true">
+    <button class="lb-btn lb-close" aria-label="Close">&times;</button>
+    <img id="map-lb-img" alt="Photograph">
+    <div class="lb-info" id="map-lb-info"></div>
+  </div>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-bottom" style="border:0">
+        <span>© <span id="year"></span> Chaminda Perera · Lio Photography</span>
+        <span><a href="gallery.html">Gallery</a> · <a href="about.html">About</a> · <a href="contact.html">Contact</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="js/images.js"></script>
+  <script src="js/photo-meta.auto.js"></script>
+  <script src="js/photo-meta.js"></script>
+  <script src="js/pano-locations.js"></script>
+  <script>
+  (function(){
+    "use strict";
+    var DATA = window.GALLERY_DATA || [];
+    var AUTO = window.PHOTO_META_AUTO || {};
+    var MANUAL = window.PHOTO_META || {};
+    var MEDIA = window.MEDIA || {};
+    var PANO = window.PANO_LOCATIONS || {};
+
+    function merged(key){ var a=AUTO[key]||{}, m=MANUAL[key]||{}, o={}, k; for(k in a)o[k]=a[k]; for(k in m)o[k]=m[k]; return o; }
+    function variant(folder,file,w,ext){ return folder+"/_web/"+encodeURIComponent(file.replace(/\.[^.]+$/,"")+"-"+w+"."+ext); }
+    function bestSrc(folder,file,target,ext){
+      var m=MEDIA[folder+"/"+file]; if(!m||!m.variants||!m.variants.length) return folder+"/"+encodeURIComponent(file);
+      var pick=m.variants[m.variants.length-1];
+      for(var i=0;i<m.variants.length;i++){ if(m.variants[i]>=target){pick=m.variants[i];break;} }
+      return variant(folder,file,pick,ext||"jpg");
+    }
+    function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+
+    // Collect geotagged photos
+    var points = [];
+    DATA.forEach(function(cat){
+      cat.images.forEach(function(file){
+        var key = cat.folder+"/"+file, m = merged(key);
+        var lat = m.lat, lng = m.lng, label = m.location || [m.city,m.country].filter(Boolean).join(", ");
+        if((lat==null||lng==null) && PANO[file]){ lat=PANO[file].lat; lng=PANO[file].lng; if(!label) label=PANO[file].label; }
+        if(lat==null||lng==null) return;
+        points.push({
+          folder:cat.folder, file:file, lat:+lat, lng:+lng, label:label, cat:cat.title,
+          title: m.title || label || cat.title,
+          exif: [m.camera,m.focal,m.aperture,m.shutter,m.iso].filter(Boolean).join("  ·  "),
+          thumb: bestSrc(cat.folder,file,640,"webp"),
+          full: bestSrc(cat.folder,file,2048,"webp")
+        });
+      });
+    });
+
+    document.getElementById("map-count").textContent =
+      points.length + " location" + (points.length===1?"":"s");
+
+    var map = L.map("map", { scrollWheelZoom:true, worldCopyJump:true })
+      .setView([20,30], 2);
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      maxZoom: 19, attribution: "© OpenStreetMap · © CARTO"
+    }).addTo(map);
+
+    if(!points.length){ document.getElementById("map-empty").style.display="block"; return; }
+
+    var cluster = L.markerClusterGroup({ maxClusterRadius: 45 });
+    var bounds = [];
+    points.forEach(function(p){
+      var icon = L.divIcon({ className:"", html:'<div class="map-pin"></div>', iconSize:[14,14], iconAnchor:[7,7] });
+      var mk = L.marker([p.lat,p.lng], { icon:icon, title:p.title });
+      var html = '<div class="map-pop"><img src="'+esc(p.thumb)+'" data-full="'+esc(p.full)+'" alt="">'+
+                 '<div class="p"><div class="t">'+esc(p.title)+'</div>'+
+                 (p.label?'<div class="l">'+esc(p.label)+'</div>':'')+
+                 (p.exif?'<div class="e">'+esc(p.exif)+'</div>':'')+'</div></div>';
+      mk.bindPopup(html, { closeButton:true });
+      cluster.addLayer(mk);
+      bounds.push([p.lat,p.lng]);
+    });
+    map.addLayer(cluster);
+    if(bounds.length>1) map.fitBounds(bounds, { padding:[50,50], maxZoom:9 });
+    else map.setView(bounds[0], 8);
+
+    // Open the lightbox when a popup thumbnail is clicked
+    var lb = document.getElementById("map-lb"), lbImg = document.getElementById("map-lb-img"), lbInfo = document.getElementById("map-lb-info");
+    document.addEventListener("click", function(e){
+      var img = e.target.closest && e.target.closest(".map-pop img");
+      if(img){ lbImg.src = img.getAttribute("data-full"); lbInfo.innerHTML = ""; lb.classList.add("open"); document.body.style.overflow="hidden"; }
+    });
+    function close(){ lb.classList.remove("open"); document.body.style.overflow=""; }
+    lb.querySelector(".lb-close").addEventListener("click", close);
+    lb.addEventListener("click", function(e){ if(e.target===lb) close(); });
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape" && lb.classList.contains("open")) close(); });
+
+    var yr=document.getElementById("year"); if(yr) yr.textContent=new Date().getFullYear();
+  })();
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>
