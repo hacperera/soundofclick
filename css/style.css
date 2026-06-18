@@ -350,6 +350,7 @@ body.menu-open .nav-toggle span:nth-child(3) { transform: translateY(-8px) rotat
 }
 .timeline .t-year { display: block; font-family: var(--serif); font-size: 21px; color: var(--accent); margin-bottom: 5px; }
 .timeline p { margin: 0; color: var(--text-dim); font-size: 15px; }
+.timeline .t-note { display: inline-block; margin-top: 6px; color: var(--accent); font-style: italic; font-size: 16px; }
 
 /* ============================================================
    Gallery grid (Bryan Minear style — masonry, mixed ratios)
