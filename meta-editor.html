@@ -100,6 +100,7 @@
       { k:"collection", label:"Collection / series", type:"text", full:false, auto:false, list:"collections" },
       { k:"location",   label:"Location name", type:"text", full:false, auto:true },
       { k:"country",    label:"Country",      type:"text",  full:false, auto:true },
+      { k:"coords",     label:"Coordinates — paste decimal or DMS (fills lat/lng)", type:"text", full:true, auto:false, helper:true },
       { k:"lat",        label:"Latitude",     type:"number",full:false, auto:true },
       { k:"lng",        label:"Longitude",    type:"number",full:false, auto:true },
       { k:"camera",     label:"Camera",       type:"text",  full:false, auto:true },
@@ -151,6 +152,41 @@
 
     function esc(s){ return String(s==null?"":s); }
 
+    // Auto-format camera/date fields so the user can type naturally
+    function normalizeField(k, val){
+      val = (val==null?"":String(val)).trim();
+      if(!val) return val;
+      switch(k){
+        case "aperture": return "f/" + val.replace(/^f\/?/i,"").trim();
+        case "shutter":  return /s\s*$/i.test(val) ? val.replace(/\s*s\s*$/i," s") : val + " s";
+        case "iso":      return "ISO " + val.replace(/^iso\s*/i,"").trim();
+        case "focal":    return /mm\s*$/i.test(val) ? val.replace(/\s*mm\s*$/i," mm")
+                              : (/^\d+(\.\d+)?$/.test(val) ? val + " mm" : val);
+        case "date":     return val.replace(/[\/.:]/g,"-");
+        default:         return val;
+      }
+    }
+    // Parse "6.0,80.2" OR "6°00'11.4\"N 80°15'23.6\"E" OR a Google-Maps paste -> {lat,lng}
+    function parseCoords(str){
+      str = (str==null?"":String(str)).trim();
+      if(!str) return null;
+      var dec = str.match(/^\s*(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)\s*$/);
+      if(dec) return { lat: parseFloat(dec[1]), lng: parseFloat(dec[2]) };
+      var re = /(\d+(?:\.\d+)?)\s*[°:\s]\s*(\d+(?:\.\d+)?)\s*['′:\s]\s*(\d+(?:\.\d+)?)\s*["″]?\s*([NSEWnsew])/g, m, parts=[];
+      while((m = re.exec(str)) !== null){
+        var v = parseFloat(m[1]) + parseFloat(m[2])/60 + parseFloat(m[3])/3600;
+        var ref = m[4].toUpperCase();
+        if(ref==="S"||ref==="W") v = -v;
+        parts.push({ ref:ref, val:+v.toFixed(6) });
+      }
+      if(parts.length>=2){
+        var la = parts.filter(function(p){return p.ref==="N"||p.ref==="S";})[0];
+        var lo = parts.filter(function(p){return p.ref==="E"||p.ref==="W";})[0];
+        return (la && lo) ? { lat: la.val, lng: lo.val } : { lat: parts[0].val, lng: parts[1].val };
+      }
+      return null;
+    }
+
     // Render one card
     var list = document.getElementById("list");
     photos.forEach(function(p){
@@ -183,6 +219,22 @@
         '<label for="f-'+btoa(unescape(encodeURIComponent(p.key))).replace(/=/g,"")+'" style="margin:0;text-transform:none;letter-spacing:0;font-size:13px;color:var(--text)">Featured (Photo of the Week, highlights)</label></div>'+
         '</div>';
       list.appendChild(card);
+    });
+
+    // Auto-format camera fields + convert coordinates on change/blur
+    list.addEventListener("change", function(e){
+      var el = e.target, k = el.dataset && el.dataset.k;
+      if(!k) return;
+      if(k==="coords"){
+        var c = parseCoords(el.value), card = el.closest(".card");
+        if(c){
+          var la=card.querySelector('[data-k="lat"]'), lo=card.querySelector('[data-k="lng"]');
+          if(la) la.value=c.lat; if(lo) lo.value=c.lng;
+          el.value = c.lat + ", " + c.lng;
+        }
+      } else if(["aperture","shutter","iso","focal","date"].indexOf(k)>=0){
+        el.value = normalizeField(k, el.value);
+      }
     });
 
     // Coverage stats
@@ -240,9 +292,10 @@
         var card = list.querySelector('[data-key="'+cssEsc(p.key)+'"]');
         var a = AUTO[p.key]||{}, entry = {};
         FIELDS.forEach(function(f){
+          if(f.helper) return;   // skip the coords paste helper
           var el = card.querySelector('[data-k="'+f.k+'"]');
           if(!el) return;
-          var val = el.value.trim();
+          var val = normalizeField(f.k, el.value);   // auto-format camera/date fields
           if(val==="") return;
           if(f.k==="keywords"){
             var arr = val.split(",").map(function(s){return s.trim();}).filter(Boolean);
