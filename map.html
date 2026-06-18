@@ -24,7 +24,10 @@
     .map-pop .e { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
     .map-pin { background: var(--accent); width: 14px; height: 14px; border-radius: 50%; border: 2px solid #1a1a1a; box-shadow: 0 0 0 3px rgba(201,168,106,.35); }
     .map-empty { text-align: center; color: var(--text-dim); padding: 40px 20px; }
+    /* Lift the lightbox above every Leaflet layer (panes/controls go up to ~1000) */
+    #map-lb { z-index: 3000; }
     #map-lb .lb-close { top: 22px; right: 26px; }
+    #map-lb #map-lb-img { max-width: 94vw; max-height: 90vh; width: auto; height: auto; }
   </style>
 </head>
 <body>
