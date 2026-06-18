@@ -291,21 +291,28 @@ body.menu-open .nav-toggle span:nth-child(3) { transform: translateY(-8px) rotat
 .service h3 { font-size: 27px; margin: 18px 0 14px; }
 .service p { color: var(--text-dim); font-size: 15px; margin: 0; }
 
-/* Framed print samples under each service */
-.print-row { display: flex; gap: 14px; margin-top: 28px; }
-.print { flex: 1 1 0; min-width: 0; transition: transform .5s cubic-bezier(.2,.7,.2,1); }
-.print:hover { transform: translateY(-5px); }
-.print .frame {
-  padding: 7px;
-  background: #0a0a0a;
-  box-shadow: 0 16px 30px rgba(0,0,0,.5);
+/* Framed prints showcase — full-width grid below the services */
+.prints-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(16px, 2vw, 28px);
+  margin-top: clamp(40px, 6vw, 70px);
 }
-.print .frame img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.print { margin: 0; transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+.print:hover { transform: translateY(-6px); }
+.print .frame {
+  padding: 12px;
+  background: #0a0a0a;
+  box-shadow: 0 18px 36px rgba(0,0,0,.5);
+}
+.print .frame img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; }
 /* three frame styles for variety */
 .print.s1 .frame { background: #0a0a0a; border: 2px solid #2c2c30; }
-.print.s2 .frame { background: #f3efe7; padding: 11px; }
+.print.s2 .frame { background: #f3efe7; padding: 16px; }
 .print.s2 .frame img { outline: 1px solid #dad5cb; }
-.print.s3 .frame { background: linear-gradient(145deg, #3c2d1b, #221809); padding: 9px; }
+.print.s3 .frame { background: linear-gradient(145deg, #3c2d1b, #221809); padding: 14px; }
+@media (max-width: 900px) { .prints-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .prints-grid { grid-template-columns: 1fr; } }
 
 /* ============================================================
    Gallery grid (Bryan Minear style — masonry, mixed ratios)

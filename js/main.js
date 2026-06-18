@@ -361,7 +361,7 @@
     });
   }
 
-  /* ---------- Framed prints under each service ---------- */
+  /* ---------- Framed prints showcase ---------- */
   function pickFromCats(ids) {
     var out = [];
     ids.forEach(function (id) {
@@ -372,37 +372,23 @@
   }
 
   function initPrints() {
-    var rows = document.querySelectorAll(".print-row");
-    if (!rows.length) return;
+    var grid = document.getElementById("prints-grid");
+    if (!grid) return;
 
     var PD = window.PRINTS_DATA;
-    var curated = (PD && PD.images && PD.images.length)
-      ? shuffle(PD.images.map(function (f) { return bestSrc(PD.folder, f, 1280, "webp"); }))
-      : [];
-    var ci = 0;
-
-    // Sensible fallback sources per service when no prints/ folder is provided.
-    var fallback = {
-      fineart:     pickFromCats(["fine-art", "landscape", "nature", "astrophotography"]),
-      licensing:   pickFromCats(["aerial", "architectural", "astrophotography", "landscape"]),
-      commissions: pickFromCats(["portrait", "food", "macro", "nature"])
-    };
+    var srcs;
+    if (PD && PD.images && PD.images.length) {
+      srcs = shuffle(PD.images.slice()).map(function (f) { return bestSrc(PD.folder, f, 1280, "webp"); });
+    } else {
+      // No prints/ folder yet — show a mix of strong gallery images as placeholders.
+      srcs = pickFromCats(["fine-art", "landscape", "aerial", "nature", "astrophotography", "architectural"]).slice(0, 6);
+    }
     var styles = ["s1", "s2", "s3"];
-
-    rows.forEach(function (row) {
-      var key = row.dataset.prints;
-      for (var i = 0; i < 3; i++) {
-        var src = null;
-        // When real prints exist, cycle through them so every slot is a print
-        // (no gallery fallback mixed in); otherwise fall back to gallery photos.
-        if (curated.length) src = curated[ci++ % curated.length];
-        else if (fallback[key] && fallback[key].length) src = fallback[key].shift();
-        if (!src) continue;
-        var fig = document.createElement("figure");
-        fig.className = "print " + styles[i % 3];
-        fig.innerHTML = '<div class="frame"><img loading="lazy" src="' + src + '" alt="Framed print"></div>';
-        row.appendChild(fig);
-      }
+    srcs.forEach(function (src, i) {
+      var fig = document.createElement("figure");
+      fig.className = "print " + styles[i % 3];
+      fig.innerHTML = '<div class="frame"><img loading="lazy" src="' + src + '" alt="Framed print"></div>';
+      grid.appendChild(fig);
     });
   }
 
