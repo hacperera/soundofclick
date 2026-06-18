@@ -361,12 +361,22 @@ body.menu-open .nav-toggle span:nth-child(3) { transform: translateY(-8px) rotat
 }
 .pexels-note { color: var(--text-dim); font-size: 15px; margin: 0 0 24px; }
 .pexels-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
-.pexels-item { display: block; overflow: hidden; }
+.pexels-item {
+  display: block; position: relative; overflow: hidden;
+  opacity: 1; transition: opacity .35s ease;
+}
+.pexels-item.fade { opacity: 0; }      /* tile fades out, swaps photo, fades back */
 .pexels-item img {
   width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block;
   transition: transform .5s cubic-bezier(.2,.7,.2,1);
 }
 .pexels-item:hover img { transform: scale(1.07); }
+.pexels-views {
+  position: absolute; left: 8px; bottom: 8px;
+  font-size: 11px; font-weight: 500; letter-spacing: .03em; color: #fff;
+  background: rgba(0,0,0,.55); padding: 3px 9px; border-radius: 999px;
+  backdrop-filter: blur(3px); pointer-events: none;
+}
 @media (max-width: 900px) { .pexels-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 520px) { .pexels-grid { grid-template-columns: repeat(2, 1fr); } }
 

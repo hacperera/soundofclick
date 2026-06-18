@@ -878,24 +878,50 @@
     nums.forEach(function (n) { obs.observe(n); });
   }
 
-  /* ---------- Pexels showcase ---------- */
+  /* ---------- Pexels showcase (row of six, gently rotating) ---------- */
   function initPexels() {
     var grid = document.getElementById("pexels-grid");
     var P = window.PEXELS;
-    if (!grid || !P || !P.photos) return;
-    P.photos.forEach(function (p) {
+    if (!grid || !P || !P.photos || !P.photos.length) return;
+    var photos = P.photos, VISIBLE = 6;
+    function thumb(p) { return p.img + "?auto=compress&cs=tinysrgb&fit=crop&w=600&h=400"; }
+    function fill(slot, p) {
+      slot.a.href = p.page || P.profile;
+      slot.img.src = thumb(p);
+      slot.img.onerror = function () { slot.a.style.visibility = "hidden"; };
+      slot.badge.textContent = p.views ? p.views + " views" : "";
+      slot.badge.style.display = p.views ? "" : "none";
+    }
+    // Build 6 fixed slots and show the first six photos.
+    var slots = [];
+    for (var i = 0; i < VISIBLE; i++) {
       var a = document.createElement("a");
-      a.href = P.profile; a.target = "_blank"; a.rel = "noopener";
-      a.className = "pexels-item";
+      a.target = "_blank"; a.rel = "noopener"; a.className = "pexels-item";
       var img = document.createElement("img");
-      img.loading = "lazy";
-      img.alt = "Photograph by Lio Photography on Pexels";
-      // Pexels CDN supports on-the-fly resizing via query params.
-      img.src = p.img + "?auto=compress&cs=tinysrgb&fit=crop&w=600&h=400";
-      img.onerror = function () { a.style.display = "none"; };  // hide if a photo was removed
-      a.appendChild(img);
+      img.loading = "lazy"; img.alt = "Photograph by Lio Photography on Pexels";
+      var badge = document.createElement("span"); badge.className = "pexels-views";
+      a.appendChild(img); a.appendChild(badge);
       grid.appendChild(a);
-    });
+      var slot = { a: a, img: img, badge: badge };
+      fill(slot, photos[i % photos.length]);
+      slots.push(slot);
+    }
+    if (photos.length <= VISIBLE) return;   // nothing to rotate
+
+    // Every few seconds, fade ONE tile (round-robin) to the next photo in the
+    // queue — a gentle ticker that cycles all photos through the six slots.
+    var slotPtr = 0, photoPtr = VISIBLE % photos.length;
+    setInterval(function () {
+      var slot = slots[slotPtr], p = photos[photoPtr];
+      var pre = new Image();             // preload so the swap is instant
+      pre.onload = pre.onerror = function () {
+        slot.a.classList.add("fade");
+        setTimeout(function () { fill(slot, p); slot.a.classList.remove("fade"); }, 350);
+      };
+      pre.src = thumb(p);
+      slotPtr = (slotPtr + 1) % slots.length;
+      photoPtr = (photoPtr + 1) % photos.length;
+    }, 3200);
   }
 
   /* ---------- Newsletter (Netlify Forms) ---------- */
