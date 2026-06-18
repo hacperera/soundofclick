@@ -602,6 +602,13 @@ picture { display: contents; }
   text-shadow: 0 1px 10px rgba(0,0,0,.95);
 }
 .lb-info .lb-exif::before { content: "📷  "; }
+.lb-info .lb-story-link {
+  display: inline-block; margin-top: 12px; pointer-events: auto;
+  font-size: 12px; letter-spacing: .06em; color: #fff;
+  background: rgba(201,168,106,.22); border: 1px solid var(--accent);
+  padding: 7px 16px; border-radius: 999px; transition: background .25s, color .25s;
+}
+.lb-info .lb-story-link:hover { background: var(--accent); color: #000; }
 
 /* ---------- 360° panorama viewer ---------- */
 .pano-modal {

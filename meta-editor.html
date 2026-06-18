@@ -111,6 +111,7 @@
       { k:"date",       label:"Date taken",   type:"text",  full:false, auto:true },
       { k:"keywords",   label:"Keywords (comma-separated)", type:"text", full:true, auto:true },
       { k:"story",      label:"Story behind the shot", type:"textarea", full:true, auto:false },
+      { k:"challenges", label:"Challenges faced (optional)", type:"textarea", full:true, auto:false },
     ];
 
     function merged(key){
@@ -232,7 +233,7 @@
     document.getElementById("folder").addEventListener("change", applyFilter);
 
     // Generate output — only write fields that differ from auto, or manual-only fields
-    var MANUAL_ONLY = { collection:1, story:1, featured:1 };
+    var MANUAL_ONLY = { collection:1, story:1, challenges:1, featured:1 };
     function generate(){
       var result = {};
       photos.forEach(function(p){

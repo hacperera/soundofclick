@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Photo Story — Lio Photography | Chaminda Perera</title>
+  <meta name="description" content="The story behind a photograph by Chaminda Perera — location, camera settings, and the moment it was made.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .story-hero { background:#000; position:relative; }
+    .story-hero img { display:block; width:100%; max-height:82vh; object-fit:contain; margin:0 auto; }
+    .story-hero .story-pano { height:72vh; }
+    .story-head { text-align:center; padding: clamp(30px,4.5vw,54px) 20px 0; }
+    .story-head h1 { font-family:var(--serif); font-size:clamp(30px,5vw,58px); line-height:1.05; margin:8px 0 0; }
+    .story-loc { color:var(--accent); font-size:14px; letter-spacing:.08em; margin-top:12px; }
+    .story-loc::before { content:"📍 "; }
+    .story-body { max-width:740px; margin:clamp(28px,4vw,46px) auto 0; padding:0 20px; }
+    .story-body p { font-size:17px; line-height:1.85; color:var(--text); margin:0 0 18px; }
+    .story-body h3 { font-family:var(--serif); font-size:24px; margin:30px 0 10px; }
+    .story-body .placeholder { color:var(--text-faint); font-style:italic; }
+    .story-details { display:grid; grid-template-columns:1fr 1fr; gap:24px; max-width:1000px; margin:clamp(34px,5vw,56px) auto 0; padding:0 20px; }
+    .panel { background:var(--bg-soft); border:1px solid var(--line); border-radius:10px; padding:20px 22px; }
+    .panel h4 { font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--text-dim); margin:0 0 14px; }
+    .exif-row { display:flex; justify-content:space-between; gap:14px; padding:7px 0; border-bottom:1px solid var(--line); font-size:14px; }
+    .exif-row:last-child { border-bottom:0; }
+    .exif-row .k { color:var(--text-dim); } .exif-row .v { color:var(--text); text-align:right; }
+    #story-map { height:240px; border-radius:8px; background:#11161d; }
+    .story-map-label { font-size:12px; color:var(--text-dim); margin-top:8px; }
+    .story-related { max-width:1180px; margin:clamp(44px,6vw,74px) auto 0; padding:0 20px; }
+    .story-related h4 { font-size:11px; letter-spacing:.2em; text-transform:uppercase; color:var(--text-dim); margin:0 0 18px; text-align:center; }
+    .rel-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+    .rel-grid a { display:block; overflow:hidden; border-radius:6px; }
+    .rel-grid img { width:100%; aspect-ratio:3/2; object-fit:cover; display:block; transition:transform .5s cubic-bezier(.2,.7,.2,1); }
+    .rel-grid a:hover img { transform:scale(1.07); }
+    .story-back { display:inline-block; margin:0 0 0; }
+    .story-foot { text-align:center; padding: clamp(40px,6vw,70px) 20px; }
+    @media (max-width:760px){ .story-details{ grid-template-columns:1fr; } .rel-grid{ grid-template-columns:repeat(2,1fr); } }
+  </style>
+</head>
+<body>
+
+  <header class="nav solid">
+    <div class="wrap">
+      <a href="index.html" class="brand">Lio <b>Photography</b></a>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="map.html">Map</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <article class="story" id="story">
+    <div class="story-hero" id="story-hero"></div>
+    <div class="story-head">
+      <p class="eyebrow"><a class="story-back" id="story-cat" href="gallery.html">Gallery</a></p>
+      <h1 id="story-title">Photo Story</h1>
+      <p class="story-loc" id="story-loc" style="display:none"></p>
+    </div>
+    <div class="story-body" id="story-body"></div>
+    <div class="story-details" id="story-details"></div>
+    <div class="story-related" id="story-related" style="display:none">
+      <h4>More from this series</h4>
+      <div class="rel-grid" id="rel-grid"></div>
+    </div>
+    <div class="story-foot">
+      <a href="gallery.html" class="btn">Back to galleries</a>
+    </div>
+  </article>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-bottom" style="border:0">
+        <span>© <span id="year"></span> Chaminda Perera · Lio Photography</span>
+        <span><a href="gallery.html">Gallery</a> · <a href="map.html">Map</a> · <a href="about.html">About</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+  <script src="js/images.js"></script>
+  <script src="js/photo-meta.auto.js"></script>
+  <script src="js/photo-meta.js"></script>
+  <script src="js/pano-locations.js"></script>
+  <script>
+  (function(){
+    "use strict";
+    var DATA=window.GALLERY_DATA||[], AUTO=window.PHOTO_META_AUTO||{}, MANUAL=window.PHOTO_META||{}, MEDIA=window.MEDIA||{}, PANO=window.PANO_LOCATIONS||{};
+    function merged(key){ var a=AUTO[key]||{},m=MANUAL[key]||{},o={},k; for(k in a)o[k]=a[k]; for(k in m)o[k]=m[k]; return o; }
+    function variant(folder,file,w,ext){ return folder+"/_web/"+encodeURIComponent(file.replace(/\.[^.]+$/,"")+"-"+w+"."+ext); }
+    function bestSrc(folder,file,t,ext){ var m=MEDIA[folder+"/"+file]; if(!m||!m.variants||!m.variants.length) return folder+"/"+encodeURIComponent(file); var p=m.variants[m.variants.length-1]; for(var i=0;i<m.variants.length;i++){ if(m.variants[i]>=t){p=m.variants[i];break;} } return variant(folder,file,p,ext||"jpg"); }
+    function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+
+    var params = new URLSearchParams(location.search);
+    var key = params.get("photo") || "";
+    var slash = key.indexOf("/");
+    var folder = slash>0 ? key.slice(0,slash) : "", file = slash>0 ? key.slice(slash+1) : "";
+    var cat = DATA.find(function(c){ return c.folder===folder; });
+    if(!folder || !file || !cat || cat.images.indexOf(file)<0){
+      document.getElementById("story-title").textContent = "Photo not found";
+      document.getElementById("story-body").innerHTML = '<p class="placeholder">This photo story isn\'t available. <a href="gallery.html">Browse the galleries →</a></p>';
+      return;
+    }
+
+    var m = merged(key);
+    var loc = m.location || [m.city,m.country].filter(Boolean).join(", ");
+    var lat = m.lat, lng = m.lng;
+    if((lat==null||lng==null) && PANO[file]){ lat=PANO[file].lat; lng=PANO[file].lng; if(!loc) loc=PANO[file].label; }
+    var title = m.title || loc || cat.title + " photograph";
+    document.title = title + " — Lio Photography";
+
+    // Hero — 360 panoramas get the live viewer; everything else a large image
+    var hero = document.getElementById("story-hero");
+    var mm = MEDIA[key] || {};
+    if(mm.pano && window.pannellum){
+      var holder = document.createElement("div"); holder.className="story-pano";
+      hero.appendChild(holder);
+      window.pannellum.viewer(holder, { type:"equirectangular", panorama:variant(folder,file,mm.pano,"webp"),
+        autoLoad:true, autoRotate:-2, compass:false, showZoomCtrl:true, showFullscreenCtrl:true, hfov:110 });
+    } else {
+      var img=document.createElement("img"); img.src=bestSrc(folder,file,2048,"webp"); img.alt=title; hero.appendChild(img);
+    }
+
+    // Head
+    var catLink=document.getElementById("story-cat"); catLink.textContent=cat.title; catLink.href="series.html#"+cat.id;
+    document.getElementById("story-title").textContent=title;
+    if(loc){ var le=document.getElementById("story-loc"); le.textContent=loc; le.style.display=""; }
+
+    // Body (story + challenges)
+    var body=document.getElementById("story-body"), html="";
+    if(m.story){ String(m.story).split(/\n\s*\n/).forEach(function(par){ html+="<p>"+esc(par.trim())+"</p>"; }); }
+    if(m.challenges){ html+="<h3>The challenge</h3>"; String(m.challenges).split(/\n\s*\n/).forEach(function(par){ html+="<p>"+esc(par.trim())+"</p>"; }); }
+    if(!html){ html='<p class="placeholder">The story behind this image is coming soon.</p>'; }
+    body.innerHTML=html;
+
+    // Details: camera panel + map panel
+    var details=document.getElementById("story-details"), dhtml="";
+    var rows=[["Camera",m.camera],["Lens",m.lens],["Focal length",m.focal],["Aperture",m.aperture],["Shutter",m.shutter],["ISO",m.iso],["Date",m.date]];
+    var exif=rows.filter(function(r){return r[1];});
+    if(exif.length){
+      dhtml+='<div class="panel"><h4>Camera &amp; settings</h4>'+exif.map(function(r){
+        return '<div class="exif-row"><span class="k">'+r[0]+'</span><span class="v">'+esc(r[1])+'</span></div>'; }).join("")+'</div>';
+    }
+    if(lat!=null && lng!=null){
+      dhtml+='<div class="panel"><h4>Where it was made</h4><div id="story-map"></div>'+(loc?'<div class="story-map-label">'+esc(loc)+'</div>':'')+'</div>';
+    }
+    details.innerHTML=dhtml;
+    if(lat!=null && lng!=null && window.L){
+      var map=L.map("story-map",{ zoomControl:true, scrollWheelZoom:false, attributionControl:false }).setView([+lat,+lng], (m.zoom||9));
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{ maxZoom:19 }).addTo(map);
+      L.circleMarker([+lat,+lng],{ radius:8, color:"#fff", weight:2, fillColor:"#c9a86a", fillOpacity:1 }).addTo(map);
+      setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 60);
+    }
+
+    // Related — same collection first, else same category; exclude self
+    var rel=[];
+    if(m.collection){
+      DATA.forEach(function(c){ c.images.forEach(function(f){ var k2=c.folder+"/"+f; if(k2!==key && merged(k2).collection===m.collection) rel.push({folder:c.folder,file:f}); }); });
+    }
+    if(rel.length<4){ cat.images.forEach(function(f){ if(f!==file && !rel.some(function(r){return r.file===f&&r.folder===cat.folder;})) rel.push({folder:cat.folder,file:f}); }); }
+    rel = rel.slice(0,8);
+    if(rel.length){
+      var rg=document.getElementById("rel-grid");
+      rel.forEach(function(r){
+        var a=document.createElement("a"); a.href="story.html?photo="+encodeURIComponent(r.folder+"/"+r.file);
+        var im=document.createElement("img"); im.loading="lazy"; im.src=bestSrc(r.folder,r.file,640,"webp"); im.alt="";
+        a.appendChild(im); rg.appendChild(a);
+      });
+      document.getElementById("story-related").style.display="";
+    }
+
+    var yr=document.getElementById("year"); if(yr) yr.textContent=new Date().getFullYear();
+  })();
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>

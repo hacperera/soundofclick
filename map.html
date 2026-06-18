@@ -23,6 +23,8 @@
     .map-pop .t { font-family: var(--serif); font-size: 18px; color: #fff; line-height: 1.2; }
     .map-pop .l { font-size: 12px; color: var(--accent); margin-top: 3px; }
     .map-pop .e { font-size: 11px; color: var(--text-dim); margin-top: 6px; }
+    .map-pop .map-story { display: inline-block; margin-top: 9px; font-size: 12px; color: var(--accent); letter-spacing: .03em; }
+    .map-pop .map-story:hover { text-decoration: underline; }
     .map-pin { background: var(--accent); width: 14px; height: 14px; border-radius: 50%; border: 2px solid #1a1a1a; box-shadow: 0 0 0 3px rgba(201,168,106,.35); }
     .map-empty { text-align: center; color: var(--text-dim); padding: 40px 20px; }
     /* Lift the lightbox above every Leaflet layer (panes/controls go up to ~1000) */
@@ -192,7 +194,9 @@
       el.innerHTML = '<img src="'+esc(p.thumb)+'" alt="View larger">'+
                  '<div class="p"><div class="t">'+esc(p.title)+'</div>'+
                  (p.label?'<div class="l">'+esc(p.label)+'</div>':'')+
-                 (p.exif?'<div class="e">'+esc(p.exif)+'</div>':'')+'</div>';
+                 (p.exif?'<div class="e">'+esc(p.exif)+'</div>':'')+
+                 '<a class="map-story" href="story.html?photo='+esc(encodeURIComponent(p.folder+"/"+p.file))+'">View full story →</a>'+
+                 '</div>';
       el.querySelector("img").addEventListener("click", function(){ if(p.isPano) openPano(p.pano); else openLb(p); });
       mk.bindPopup(el, { closeButton:true, minWidth:240 });
       cluster.addLayer(mk);

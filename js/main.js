@@ -663,6 +663,10 @@
       if (loc) html += '<div class="lb-loc">' + escHtml(loc) + '</div>';
       var exif = [m.camera, m.lens, m.focal, m.aperture, m.shutter, m.iso].filter(Boolean);
       if (exif.length) html += '<div class="lb-exif">' + escHtml(exif.join("   ·   ")) + '</div>';
+      if (m.story || m.location || m.camera || m.lat != null) {
+        html += '<a class="lb-story-link" href="story.html?photo=' +
+                encodeURIComponent(item.folder + "/" + item.file) + '">Read the full story →</a>';
+      }
       info.innerHTML = html;
     }
   }
