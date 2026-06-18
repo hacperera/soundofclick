@@ -579,8 +579,8 @@ picture { display: contents; }
 .lb-next { right: 8px; }
 .lb-close { top: 22px; right: 26px; transform: none; font-size: 30px; }
 .lb-meta {
-  position: absolute; left: 0; right: 0; bottom: 14px; text-align: center;
-  font-size: 12px; letter-spacing: .14em; color: var(--text-dim);
+  position: absolute; left: auto; right: 22px; bottom: 16px; text-align: right;
+  font-size: 11px; letter-spacing: .12em; color: var(--text-faint);
   text-shadow: 0 1px 6px rgba(0,0,0,.9); pointer-events: none;
 }
 /* EXIF + location panel in the lightbox (shown when a photo has metadata) */
