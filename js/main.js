@@ -379,6 +379,38 @@
     });
   }
 
+  /* ---------- Featured collections grid (gallery page) ---------- */
+  function initCollections() {
+    var grid = document.getElementById("coll-grid");
+    if (!grid) return;
+    var colls = {};
+    DATA.forEach(function (cat) {
+      cat.images.forEach(function (file) {
+        var m = photoMeta(cat.folder, file);
+        if (!m.collection) return;
+        (colls[m.collection] = colls[m.collection] || []).push({ folder: cat.folder, file: file, featured: !!m.featured });
+      });
+    });
+    var names = Object.keys(colls).sort();
+    var section = document.getElementById("collections-section");
+    if (!names.length) { if (section) section.style.display = "none"; return; }
+    names.forEach(function (name) {
+      var items = colls[name];
+      var cover = items.filter(function (x) { return x.featured; })[0] || items[0];
+      var a = document.createElement("a");
+      a.className = "cat-card reveal-up";
+      a.href = "series.html?collection=" + encodeURIComponent(name);
+      a.appendChild(buildPicture(cover.folder, cover.file,
+        "(max-width:700px) 50vw, (max-width:1100px) 33vw, 25vw", { alt: name }));
+      var label = document.createElement("div");
+      label.className = "label";
+      label.innerHTML = '<div class="t">' + escHtml(name) + '</div>' +
+        '<div class="n">' + items.length + ' image' + (items.length > 1 ? "s" : "") + '</div>';
+      a.appendChild(label);
+      grid.appendChild(a);
+    });
+  }
+
   /* ---------- Framed prints showcase ---------- */
   function pickFromCats(ids) {
     var out = [];
@@ -570,7 +602,7 @@
             viewItems.push({ folder: cat.folder, file: file, cat: cat.title });
         });
       });
-      nextHref = "collections.html"; nextLabel = "All collections";
+      nextHref = "gallery.html#collections-section"; nextLabel = "All collections";
     } else {
       var hash = (location.hash || "").replace("#", "");
       var cat = DATA.find(function (c) { return c.id === hash; }) || DATA[0];
@@ -1020,6 +1052,7 @@
     initHero();
     initScreensaver();
     initCategoryCards();
+    initCollections();
     initPrints();
     initVideos();
     initVideoModal();
