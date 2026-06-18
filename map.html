@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
   <link rel="stylesheet" href="css/style.css">
   <style>
     .map-wrap { padding: 0 0 clamp(60px,10vh,120px); }
@@ -28,6 +29,16 @@
     #map-lb { z-index: 3000; }
     #map-lb .lb-close { top: 22px; right: 26px; }
     #map-lb #map-lb-img { max-width: 94vw; max-height: 90vh; width: auto; height: auto; }
+    /* 360 viewer above Leaflet too */
+    #map-pano { z-index: 3200; }
+    /* Reset-to-full-view control */
+    .map-reset {
+      width: 36px; height: 36px; margin: 10px; cursor: pointer;
+      background: #15151a; color: var(--text); border: 1px solid var(--line);
+      border-radius: 6px; font-size: 17px; line-height: 1;
+      box-shadow: 0 2px 10px rgba(0,0,0,.45); transition: color .2s, border-color .2s;
+    }
+    .map-reset:hover { color: var(--accent); border-color: var(--accent); }
   </style>
 </head>
 <body>
@@ -63,11 +74,18 @@
     </div>
   </div>
 
-  <!-- Lightbox -->
+  <!-- Lightbox (flat photos) -->
   <div class="lightbox" id="map-lb" aria-hidden="true">
     <button class="lb-btn lb-close" aria-label="Close">&times;</button>
     <img id="map-lb-img" alt="Photograph">
     <div class="lb-info" id="map-lb-info"></div>
+  </div>
+
+  <!-- 360 panorama viewer -->
+  <div class="pano-modal" id="map-pano" aria-hidden="true">
+    <button class="pano-close" aria-label="Close panorama">&times;</button>
+    <div class="pano-stage" id="map-pano-stage"></div>
+    <div class="pano-hint">Drag to look around · scroll to zoom · this is a 360° photo</div>
   </div>
 
   <footer class="footer">
@@ -81,6 +99,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
   <script src="js/images.js"></script>
   <script src="js/photo-meta.auto.js"></script>
   <script src="js/photo-meta.js"></script>
@@ -112,12 +131,15 @@
         var lat = m.lat, lng = m.lng, label = m.location || [m.city,m.country].filter(Boolean).join(", ");
         if((lat==null||lng==null) && PANO[file]){ lat=PANO[file].lat; lng=PANO[file].lng; if(!label) label=PANO[file].label; }
         if(lat==null||lng==null) return;
+        var mm = MEDIA[key] || {};
         points.push({
           folder:cat.folder, file:file, lat:+lat, lng:+lng, label:label, cat:cat.title,
           title: m.title || label || cat.title,
           exif: [m.camera,m.focal,m.aperture,m.shutter,m.iso].filter(Boolean).join("  ·  "),
           thumb: bestSrc(cat.folder,file,640,"webp"),
-          full: bestSrc(cat.folder,file,2048,"webp")
+          full: bestSrc(cat.folder,file,2048,"webp"),
+          isPano: !!mm.pano,
+          pano: mm.pano ? variant(cat.folder,file,mm.pano,"webp") : null
         });
       });
     });
@@ -149,6 +171,21 @@
     lb.addEventListener("click", function(e){ if(e.target===lb) closeLb(); });
     document.addEventListener("keydown", function(e){ if(e.key==="Escape" && lb.classList.contains("open")) closeLb(); });
 
+    // 360 panorama viewer (Pannellum) — used for equirectangular photos
+    var panoModal = document.getElementById("map-pano"), panoStage = document.getElementById("map-pano-stage"), panoViewer = null;
+    function openPano(src){
+      if(!window.pannellum || !src){ openLb({ full: src }); return; }
+      panoModal.classList.add("open"); document.body.style.overflow="hidden";
+      if(panoViewer){ try{ panoViewer.destroy(); }catch(e){} panoViewer=null; }
+      panoViewer = window.pannellum.viewer(panoStage, {
+        type:"equirectangular", panorama:src, autoLoad:true, autoRotate:-2,
+        compass:false, showZoomCtrl:true, showFullscreenCtrl:true, hfov:110, friction:0.2
+      });
+    }
+    function closePano(){ panoModal.classList.remove("open"); document.body.style.overflow=""; if(panoViewer){ try{ panoViewer.destroy(); }catch(e){} panoViewer=null; } }
+    panoModal.querySelector(".pano-close").addEventListener("click", closePano);
+    document.addEventListener("keydown", function(e){ if(e.key==="Escape" && panoModal.classList.contains("open")) closePano(); });
+
     var cluster = L.markerClusterGroup({ maxClusterRadius: 45 });
     var bounds = [];
     points.forEach(function(p){
@@ -162,14 +199,32 @@
                  '<div class="p"><div class="t">'+esc(p.title)+'</div>'+
                  (p.label?'<div class="l">'+esc(p.label)+'</div>':'')+
                  (p.exif?'<div class="e">'+esc(p.exif)+'</div>':'')+'</div>';
-      el.querySelector("img").addEventListener("click", function(){ openLb(p); });
+      el.querySelector("img").addEventListener("click", function(){ if(p.isPano) openPano(p.pano); else openLb(p); });
       mk.bindPopup(el, { closeButton:true, minWidth:240 });
       cluster.addLayer(mk);
       bounds.push([p.lat,p.lng]);
     });
     map.addLayer(cluster);
-    if(bounds.length>1) map.fitBounds(bounds, { padding:[50,50], maxZoom:9 });
-    else map.setView(bounds[0], 8);
+    function resetView(){
+      if(bounds.length>1) map.fitBounds(bounds, { padding:[50,50], maxZoom:9 });
+      else if(bounds.length===1) map.setView(bounds[0], 8);
+      else map.setView([20,30], 2);
+    }
+    resetView();
+
+    // "Reset to full view" button (top-right)
+    var ResetCtl = L.Control.extend({
+      options: { position: "topright" },
+      onAdd: function(){
+        var b = L.DomUtil.create("button", "map-reset");
+        b.type = "button"; b.title = "Reset to full view"; b.setAttribute("aria-label","Reset to full view");
+        b.innerHTML = "&#127758;";   // 🌍
+        L.DomEvent.on(b, "click", function(e){ L.DomEvent.stop(e); resetView(); });
+        L.DomEvent.disableClickPropagation(b);
+        return b;
+      }
+    });
+    map.addControl(new ResetCtl());
 
     var yr=document.getElementById("year"); if(yr) yr.textContent=new Date().getFullYear();
   })();
