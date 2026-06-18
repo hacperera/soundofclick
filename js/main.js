@@ -558,44 +558,54 @@
     var grid = document.getElementById("masonry");
     if (!grid) return;
 
-    var hash = (location.hash || "").replace("#", "");
-    var cat = DATA.find(function (c) { return c.id === hash; }) || DATA[0];
-    if (!cat) return;
+    // Two modes: a category (?#id / default) or a collection (?collection=Name).
+    var collName = new URLSearchParams(location.search).get("collection");
+    var title, viewItems = [], nextHref, nextLabel;
 
-    // Page heading + document title
-    var titleEl = document.getElementById("series-title");
-    var countEl = document.getElementById("series-count");
-    if (titleEl) titleEl.textContent = cat.title;
-    if (countEl) countEl.textContent = cat.images.length + " photograph" + (cat.images.length > 1 ? "s" : "");
-    document.title = cat.title + " — Lio Photography | Chaminda Perera";
-
-    // Build "next series" link for continuous browsing
-    var nextLink = document.getElementById("series-next");
-    if (nextLink) {
-      var pos = DATA.indexOf(cat);
-      var next = DATA[(pos + 1) % DATA.length];
-      nextLink.href = "series.html#" + next.id;
-      nextLink.textContent = "Next series — " + next.title;
+    if (collName) {
+      title = collName;
+      DATA.forEach(function (cat) {
+        cat.images.forEach(function (file) {
+          if (photoMeta(cat.folder, file).collection === collName)
+            viewItems.push({ folder: cat.folder, file: file, cat: cat.title });
+        });
+      });
+      nextHref = "collections.html"; nextLabel = "All collections";
+    } else {
+      var hash = (location.hash || "").replace("#", "");
+      var cat = DATA.find(function (c) { return c.id === hash; }) || DATA[0];
+      if (!cat) return;
+      title = cat.title;
+      cat.images.forEach(function (file) { viewItems.push({ folder: cat.folder, file: file, cat: cat.title }); });
+      var pos = DATA.indexOf(cat), next = DATA[(pos + 1) % DATA.length];
+      nextHref = "series.html#" + next.id; nextLabel = "Next series — " + next.title;
     }
 
-    // The 360° album holds equirectangular images — open them in an immersive
-    // panorama viewer instead of the flat lightbox.
-    var is360 = cat.id === "360";
+    var titleEl = document.getElementById("series-title");
+    var countEl = document.getElementById("series-count");
+    if (titleEl) titleEl.textContent = title;
+    if (countEl) countEl.textContent = viewItems.length + " photograph" + (viewItems.length !== 1 ? "s" : "");
+    document.title = title + " — Lio Photography | Chaminda Perera";
+
+    var nextLink = document.getElementById("series-next");
+    if (nextLink) { nextLink.href = nextHref; nextLink.textContent = nextLabel; }
 
     lb.items = [];
-    var panoItems = [];   // ordered list of 360 panoramas for the tour viewer
-    cat.images.forEach(function (file) {
+    var panoItems = [];   // ordered list of panoramas in this view (for the tour viewer)
+    viewItems.forEach(function (it) {
       var i = lb.items.length;
-      lb.items.push({ folder: cat.folder, file: file, cat: cat.title });
-      if (is360) panoItems.push({ folder: cat.folder, file: file, src: panoSrc(cat.folder, file) });
+      lb.items.push({ folder: it.folder, file: it.file, cat: it.cat });
+      // A photo is a panorama if it has a wide equirectangular variant (MEDIA.pano).
+      var m = media(it.folder, it.file), isPano = !!(m && m.pano), panoIdx = -1;
+      if (isPano) { panoIdx = panoItems.length; panoItems.push({ folder: it.folder, file: it.file, src: panoSrc(it.folder, it.file) }); }
 
       var tile = document.createElement("figure");
-      tile.className = "tile" + (is360 ? " tile--360" : "");
+      tile.className = "tile" + (isPano ? " tile--360" : "");
       tile.dataset.idx = i;
-      tile.appendChild(buildPicture(cat.folder, file,
+      tile.appendChild(buildPicture(it.folder, it.file,
         "(max-width:700px) 100vw, (max-width:1100px) 50vw, 33vw",
-        { alt: cat.title + " photograph" }));
-      if (is360) {
+        { alt: it.cat + " photograph" }));
+      if (isPano) {
         var badge = document.createElement("span");
         badge.className = "tile-360-badge";
         badge.setAttribute("aria-hidden", "true");
@@ -604,10 +614,10 @@
       }
       var cap = document.createElement("figcaption");
       cap.className = "tile-cap";
-      cap.innerHTML = '<span class="c">' + cat.title + '</span>';
+      cap.innerHTML = '<span class="c">' + it.cat + '</span>';
       tile.appendChild(cap);
-      if (is360) {
-        tile.addEventListener("click", function () { openPano(i); });
+      if (isPano) {
+        tile.addEventListener("click", (function (pi) { return function () { openPano(pi); }; })(panoIdx));
       } else {
         tile.addEventListener("click", function () { openLightbox(parseInt(tile.dataset.idx, 10)); });
       }

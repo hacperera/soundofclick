@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collections — Lio Photography | Chaminda Perera</title>
+  <meta name="description" content="Themed photo collections by Chaminda Perera — stories grouped across deserts, cities, night skies and travels.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="nav solid">
+    <div class="wrap">
+      <a href="index.html" class="brand">Lio <b>Photography</b></a>
+      <button class="nav-toggle" aria-label="Menu"><span></span><span></span><span></span></button>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="collections.html" class="active">Collections</a></li>
+          <li><a href="map.html">Map</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="gallery-intro">
+    <div class="wrap">
+      <p class="eyebrow">Stories</p>
+      <div class="section-head"><h2>Collections.</h2><p>Bodies of work grouped by place and theme — <span id="coll-count"></span>. Each one is a story to wander through.</p></div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="cat-grid" id="coll-grid"></div>
+    <p id="coll-empty" style="display:none; color:var(--text-dim); max-width:620px;">
+      No collections yet. Group photos into a collection by setting a <strong>collection</strong> name in the metadata editor — e.g. “Desert Adventures” or “Cityscapes” — and they'll appear here.
+    </p>
+  </div>
+
+  <div style="height: clamp(60px,10vh,120px)"></div>
+
+  <footer class="footer">
+    <div class="wrap">
+      <div class="footer-bottom" style="border:0">
+        <span>© <span id="year"></span> Chaminda Perera · Lio Photography</span>
+        <span><a href="gallery.html">Gallery</a> · <a href="map.html">Map</a> · <a href="about.html">About</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/images.js"></script>
+  <script src="js/photo-meta.auto.js"></script>
+  <script src="js/photo-meta.js"></script>
+  <script>
+  (function(){
+    "use strict";
+    var DATA=window.GALLERY_DATA||[], AUTO=window.PHOTO_META_AUTO||{}, MANUAL=window.PHOTO_META||{}, MEDIA=window.MEDIA||{};
+    function merged(key){ var a=AUTO[key]||{},m=MANUAL[key]||{},o={},k; for(k in a)o[k]=a[k]; for(k in m)o[k]=m[k]; return o; }
+    function variant(folder,file,w,ext){ return folder+"/_web/"+encodeURIComponent(file.replace(/\.[^.]+$/,"")+"-"+w+"."+ext); }
+    function bestSrc(folder,file,t,ext){ var m=MEDIA[folder+"/"+file]; if(!m||!m.variants||!m.variants.length) return folder+"/"+encodeURIComponent(file); var p=m.variants[m.variants.length-1]; for(var i=0;i<m.variants.length;i++){ if(m.variants[i]>=t){p=m.variants[i];break;} } return variant(folder,file,p,ext||"jpg"); }
+    function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+
+    // Gather collections from merged metadata: name -> [{folder,file}], with optional cover (featured first)
+    var colls = {};
+    DATA.forEach(function(cat){
+      cat.images.forEach(function(file){
+        var m = merged(cat.folder+"/"+file);
+        if(!m.collection) return;
+        (colls[m.collection] = colls[m.collection] || []).push({ folder:cat.folder, file:file, featured:!!m.featured });
+      });
+    });
+    var names = Object.keys(colls).sort();
+    var grid = document.getElementById("coll-grid");
+    document.getElementById("coll-count").textContent = names.length + " collection" + (names.length===1?"":"s");
+
+    if(!names.length){ document.getElementById("coll-empty").style.display="block"; }
+    names.forEach(function(name){
+      var items = colls[name];
+      var cover = items.filter(function(x){return x.featured;})[0] || items[0];
+      var a = document.createElement("a");
+      a.className = "cat-card reveal-up";
+      a.href = "series.html?collection=" + encodeURIComponent(name);
+      a.innerHTML =
+        '<img loading="lazy" src="'+bestSrc(cover.folder,cover.file,640,"webp")+'" alt="'+esc(name)+'">'+
+        '<div class="label"><div class="t">'+esc(name)+'</div>'+
+        '<div class="n">'+items.length+' image'+(items.length>1?"s":"")+'</div></div>';
+      grid.appendChild(a);
+    });
+
+    var yr=document.getElementById("year"); if(yr) yr.textContent=new Date().getFullYear();
+  })();
+  </script>
+  <script src="js/main.js"></script>
+</body>
+</html>
