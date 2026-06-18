@@ -8,6 +8,8 @@ window.PHOTO_META = {
     "collection": "Sunset on the Beach",
     "location": "Dalawella Beach, Unawatuna",
     "country": "Sri Lanka",
+    "lat": 6.003167,
+    "lng": 80.256556,
     "camera": "Canon EOS 5D Mark III",
     "lens": "Canon EF 14mm f/2.8L II USM",
     "focal": "14 mm",
