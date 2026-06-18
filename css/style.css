@@ -352,6 +352,24 @@ body.menu-open .nav-toggle span:nth-child(3) { transform: translateY(-8px) rotat
 .timeline p { margin: 0; color: var(--text-dim); font-size: 15px; }
 .timeline .t-note { display: inline-block; margin-top: 6px; color: var(--accent); font-style: italic; font-size: 16px; }
 
+/* ---------- Pexels showcase (under the stats) ---------- */
+.pexels {
+  text-align: center;
+  margin-top: clamp(40px, 6vw, 64px);
+  padding-top: clamp(32px, 5vw, 50px);
+  border-top: 1px solid var(--line);
+}
+.pexels-note { color: var(--text-dim); font-size: 15px; margin: 0 0 24px; }
+.pexels-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.pexels-item { display: block; overflow: hidden; }
+.pexels-item img {
+  width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block;
+  transition: transform .5s cubic-bezier(.2,.7,.2,1);
+}
+.pexels-item:hover img { transform: scale(1.07); }
+@media (max-width: 900px) { .pexels-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 520px) { .pexels-grid { grid-template-columns: repeat(2, 1fr); } }
+
 /* ============================================================
    Gallery grid (Bryan Minear style — masonry, mixed ratios)
    ============================================================ */

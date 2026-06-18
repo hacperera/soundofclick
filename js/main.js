@@ -878,6 +878,26 @@
     nums.forEach(function (n) { obs.observe(n); });
   }
 
+  /* ---------- Pexels showcase ---------- */
+  function initPexels() {
+    var grid = document.getElementById("pexels-grid");
+    var P = window.PEXELS;
+    if (!grid || !P || !P.photos) return;
+    P.photos.forEach(function (p) {
+      var a = document.createElement("a");
+      a.href = P.profile; a.target = "_blank"; a.rel = "noopener";
+      a.className = "pexels-item";
+      var img = document.createElement("img");
+      img.loading = "lazy";
+      img.alt = "Photograph by Lio Photography on Pexels";
+      // Pexels CDN supports on-the-fly resizing via query params.
+      img.src = p.img + "?auto=compress&cs=tinysrgb&fit=crop&w=600&h=400";
+      img.onerror = function () { a.style.display = "none"; };  // hide if a photo was removed
+      a.appendChild(img);
+      grid.appendChild(a);
+    });
+  }
+
   /* ---------- Newsletter (Netlify Forms) ---------- */
   function initNewsletter() {
     var form = document.getElementById("newsletter-form");
@@ -939,6 +959,7 @@
     initLightboxControls();
     initPanoControls();
     initStats();
+    initPexels();
     initNewsletter();
     initReveal();
     var yr = document.getElementById("year");
