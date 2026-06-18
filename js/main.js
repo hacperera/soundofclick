@@ -851,6 +851,33 @@
     });
   }
 
+  /* ---------- Statistics count-up ---------- */
+  function initStats() {
+    var nums = document.querySelectorAll(".stat-num");
+    if (!nums.length || !("IntersectionObserver" in window)) {
+      nums.forEach(function (el) { el.textContent = (parseInt(el.dataset.target, 10) || 0).toLocaleString(); });
+      return;
+    }
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var el = en.target; obs.unobserve(el);
+        var target = parseInt(el.dataset.target, 10) || 0, start = null, dur = 1400;
+        function step(ts) {
+          if (!start) start = ts;
+          var p = Math.min((ts - start) / dur, 1);
+          // ease-out so it decelerates into the final number
+          var eased = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.floor(eased * target).toLocaleString();
+          if (p < 1) requestAnimationFrame(step);
+          else el.textContent = target.toLocaleString();
+        }
+        requestAnimationFrame(step);
+      });
+    }, { threshold: 0.4 });
+    nums.forEach(function (n) { obs.observe(n); });
+  }
+
   /* ---------- Newsletter (Netlify Forms) ---------- */
   function initNewsletter() {
     var form = document.getElementById("newsletter-form");
@@ -911,6 +938,7 @@
     initSeries();
     initLightboxControls();
     initPanoControls();
+    initStats();
     initNewsletter();
     initReveal();
     var yr = document.getElementById("year");
