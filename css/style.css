@@ -564,8 +564,9 @@ picture { display: contents; }
 }
 .lightbox.open { display: flex; opacity: 1; }
 .lightbox img {
-  max-width: 96vw; max-height: 94vh; object-fit: contain;
-  box-shadow: 0 30px 80px rgba(0,0,0,.6);
+  /* Fill the viewport as large as possible while keeping the whole photo
+     visible and undistorted (scales small variants up too). */
+  width: 96vw; height: 94vh; object-fit: contain;
 }
 .lb-btn {
   position: absolute; top: 50%; transform: translateY(-50%);
@@ -584,31 +585,33 @@ picture { display: contents; }
 }
 /* EXIF + location panel in the lightbox (shown when a photo has metadata) */
 .lb-info {
-  position: absolute; left: 0; right: 0; bottom: 40px; z-index: 1;
+  position: absolute; left: 0; right: 0; bottom: 22px; z-index: 1;
   text-align: center; padding: 0 16px; pointer-events: none;
 }
 .lb-info:empty { display: none; }
 .lb-info .lb-title {
-  font-family: var(--serif); font-size: clamp(18px, 2.4vw, 24px); color: #fff;
-  margin-bottom: 4px; text-shadow: 0 2px 12px rgba(0,0,0,.95);
+  font-family: var(--serif); font-size: clamp(15px, 1.7vw, 19px); color: #fff;
+  margin-bottom: 3px; text-shadow: 0 2px 12px rgba(0,0,0,.95);
 }
 .lb-info .lb-loc {
-  font-size: 13px; letter-spacing: .06em; color: var(--accent); margin-bottom: 7px;
+  font-size: 12px; letter-spacing: .05em; color: var(--accent); margin-bottom: 6px;
   text-shadow: 0 1px 10px rgba(0,0,0,.95);
 }
 .lb-info .lb-loc::before { content: "📍 "; }
 .lb-info .lb-exif {
-  font-size: 12px; letter-spacing: .06em; color: #ddd9d1;
+  font-size: 11px; letter-spacing: .05em; color: #d6d2ca; margin-top: 8px;
   text-shadow: 0 1px 10px rgba(0,0,0,.95);
 }
 .lb-info .lb-exif::before { content: "📷  "; }
+/* Subtle, low-profile "story" button so it doesn't intrude on the photo */
 .lb-info .lb-story-link {
-  display: inline-block; margin-top: 12px; pointer-events: auto;
-  font-size: 12px; letter-spacing: .06em; color: #fff;
-  background: rgba(201,168,106,.22); border: 1px solid var(--accent);
-  padding: 7px 16px; border-radius: 999px; transition: background .25s, color .25s;
+  display: inline-block; margin: 4px 0 0; pointer-events: auto;
+  font-size: 10.5px; letter-spacing: .08em; color: #fff;
+  background: rgba(0,0,0,.3); border: 1px solid rgba(201,168,106,.5);
+  padding: 3px 12px; border-radius: 999px; backdrop-filter: blur(3px);
+  transition: background .25s, color .25s, border-color .25s;
 }
-.lb-info .lb-story-link:hover { background: var(--accent); color: #000; }
+.lb-info .lb-story-link:hover { background: var(--accent); color: #000; border-color: var(--accent); }
 
 /* ---------- 360° panorama viewer ---------- */
 .pano-modal {
