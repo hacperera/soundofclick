@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Managing the Lio Photography Website — Course</title>
+<style>
+  :root{
+    --bg:#0c0c0f; --panel:#141418; --panel2:#1a1a20; --line:rgba(255,255,255,.12);
+    --text:#ece9e3; --dim:#a39f96; --faint:#6f6b63; --accent:#c9a86a; --accent2:#e0c389;
+    --ok:#7fcf8f; --serif:Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.65 var(--sans);}
+  a{color:var(--accent)}
+  /* Layout */
+  .wrap{display:grid;grid-template-columns:300px 1fr;min-height:100vh;}
+  aside{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--panel);border-right:1px solid var(--line);padding:22px 16px;}
+  .brand{font-family:var(--serif);font-size:20px;font-weight:600;margin:0 6px 4px;}
+  .brand b{color:var(--accent)}
+  .brand small{display:block;font-family:var(--sans);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-top:6px;font-weight:400;}
+  .progress{margin:16px 6px 18px;}
+  .progress .bar{height:6px;background:var(--panel2);border-radius:999px;overflow:hidden;}
+  .progress .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s ease;}
+  .progress .lbl{font-size:11px;color:var(--dim);margin-top:6px;letter-spacing:.04em;}
+  nav.toc{list-style:none;margin:0;padding:0;}
+  .toc a{display:flex;gap:10px;align-items:center;padding:9px 12px;border-radius:8px;color:var(--text);text-decoration:none;font-size:14px;cursor:pointer;}
+  .toc a:hover{background:var(--panel2);}
+  .toc a.active{background:var(--accent);color:#000;font-weight:600;}
+  .toc a .ico{width:20px;text-align:center;}
+  .toc a .done{margin-left:auto;color:var(--ok);font-size:13px;opacity:0;}
+  .toc a.completed .done{opacity:1;}
+  .toc a.active .done{color:#000;}
+  /* Content */
+  main{padding:0;}
+  .topbar{position:sticky;top:0;z-index:5;background:rgba(12,12,15,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 40px;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--dim);}
+  .content{max-width:820px;margin:0 auto;padding:34px 40px 90px;}
+  .eyebrow{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin:0 0 6px;}
+  h1{font-family:var(--serif);font-size:34px;line-height:1.15;margin:0 0 14px;}
+  h2{font-family:var(--serif);font-size:24px;margin:34px 0 10px;}
+  h3{font-size:17px;margin:24px 0 8px;color:var(--accent2);}
+  p{margin:0 0 14px;}
+  ul,ol{margin:0 0 16px;padding-left:22px;}
+  li{margin:6px 0;}
+  strong{color:#fff;}
+  code{background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:1px 6px;font-size:13.5px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--accent2);}
+  .cmd{position:relative;background:#0a0a0c;border:1px solid var(--line);border-radius:8px;padding:14px 16px;margin:6px 0 16px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;color:#dfe7df;overflow-x:auto;white-space:pre;}
+  .cmd .copy{position:absolute;top:8px;right:8px;background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:6px;font-size:11px;padding:4px 9px;cursor:pointer;}
+  .cmd .copy:hover{color:var(--accent);border-color:var(--accent);}
+  .callout{border-left:3px solid var(--accent);background:var(--panel);border-radius:0 8px 8px 0;padding:12px 16px;margin:16px 0;font-size:14.5px;}
+  .callout.tip{border-color:var(--ok);}
+  .callout.warn{border-color:#e0a06a;}
+  .callout b{color:#fff;}
+  .steps{counter-reset:s;list-style:none;padding-left:0;}
+  .steps>li{counter-increment:s;position:relative;padding:4px 0 4px 44px;margin:10px 0;}
+  .steps>li::before{content:counter(s);position:absolute;left:0;top:2px;width:30px;height:30px;border-radius:50%;background:var(--accent);color:#000;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  table{width:100%;border-collapse:collapse;margin:8px 0 18px;font-size:14px;}
+  th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;vertical-align:top;}
+  th{background:var(--panel);color:var(--accent);font-weight:600;}
+  .pager{display:flex;justify-content:space-between;gap:14px;margin-top:40px;border-top:1px solid var(--line);padding-top:22px;}
+  .btn{background:var(--accent);color:#000;border:0;border-radius:8px;padding:11px 18px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line);}
+  .btn:disabled{opacity:.35;cursor:default;}
+  .module{display:none;}
+  .module.active{display:block;animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .menu-toggle{display:none;}
+  kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:12px;}
+  @media(max-width:880px){
+    .wrap{grid-template-columns:1fr;}
+    aside{position:fixed;left:0;top:0;width:280px;z-index:20;transform:translateX(-100%);transition:transform .3s ease;}
+    body.nav-open aside{transform:none;}
+    .menu-toggle{display:inline-flex;}
+    .content{padding:24px 18px 80px;}
+    .topbar{padding:12px 18px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <aside id="aside">
+    <div class="brand">Lio <b>Photography</b><small>Site Manager's Course</small></div>
+    <div class="progress">
+      <div class="bar"><i id="progbar"></i></div>
+      <div class="lbl" id="proglbl">0% complete</div>
+    </div>
+    <nav class="toc" id="toc"></nav>
+    <p style="font-size:11px;color:var(--faint);margin:18px 6px 0">Your progress is saved in this browser. Last updated: 19 Jun 2026.</p>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <button class="btn ghost menu-toggle" onclick="document.body.classList.toggle('nav-open')">☰ Menu</button>
+      <span id="crumb">Welcome</span>
+      <span style="flex:1"></span>
+      <span id="counter"></span>
+    </div>
+    <div class="content" id="content">
+
+      <!-- ════════════ MODULE 1 ════════════ -->
+      <section class="module" data-title="Welcome" data-icon="👋">
+        <p class="eyebrow">Start here</p>
+        <h1>Welcome — you're the keeper of this website</h1>
+        <p>This course teaches you everything you need to <strong>manage and grow the Lio Photography website</strong> — uploading photos, writing their stories, putting them on the map, and publishing it all live. No coding background needed; every step is spelled out.</p>
+        <h2>How this course works</h2>
+        <ul>
+          <li>Use the menu on the left to move between lessons. Each builds on the last, so going in order is best the first time.</li>
+          <li>Click <strong>“Mark complete”</strong> at the bottom of a lesson — your progress bar fills and is remembered in this browser.</li>
+          <li>Any command you need to type appears in a dark box with a <strong>Copy</strong> button.</li>
+        </ul>
+        <div class="callout tip"><b>The golden rule:</b> you almost never touch code. You add <em>information</em> to photos using a friendly editor, and run one command to publish. That's it.</div>
+        <h2>What you'll be able to do by the end</h2>
+        <ul>
+          <li>Add new photos and have them optimized automatically.</li>
+          <li>Give a photo a title, story, location, and keywords.</li>
+          <li>Group photos into collections, put them on the world map, and make them searchable.</li>
+          <li>Publish your changes so the live website updates.</li>
+        </ul>
+      </section>
+
+      <!-- ════════════ MODULE 2 ════════════ -->
+      <section class="module" data-title="How the site works" data-icon="🗺️">
+        <p class="eyebrow">The big picture</p>
+        <h1>How the website is put together</h1>
+        <p>You don't need the technical details, but a simple mental model makes everything else click.</p>
+        <h2>The three moving parts</h2>
+        <table>
+          <tr><th>Part</th><th>What it is</th></tr>
+          <tr><td><strong>Your computer</strong></td><td>Where the photos and website files live. You add photos and run one command here.</td></tr>
+          <tr><td><strong>GitHub</strong></td><td>An online “save vault” that stores a copy of the whole site.</td></tr>
+          <tr><td><strong>Netlify</strong></td><td>The web host. Whenever GitHub updates, Netlify automatically rebuilds the live site within ~2 minutes.</td></tr>
+        </table>
+        <p>So the flow is always: <strong>change on your computer → send to GitHub → Netlify publishes it.</strong></p>
+        <h2>Two kinds of photo information</h2>
+        <p>Every photo can carry information in <strong>two layers</strong> that combine automatically:</p>
+        <ul>
+          <li><strong>Automatic layer</strong> — camera settings, date, and (sometimes) GPS read straight from the photo file's EXIF data. You don't type these.</li>
+          <li><strong>Your layer</strong> — title, story, location, collection, keywords that you add in the editor. <em>Your layer always wins</em> if both have the same field.</li>
+        </ul>
+        <div class="callout"><b>Why this matters:</b> re-running the build never erases a story you wrote. Your words are safe.</div>
+        <h2>The key files (you'll meet these later)</h2>
+        <table>
+          <tr><th>File</th><th>What it does</th></tr>
+          <tr><td><code>photos_*</code> folders</td><td>Where the actual photos live. Each folder is a gallery.</td></tr>
+          <tr><td><code>generate_manifest.py</code></td><td>The one command you run after adding photos — it optimizes images and reads metadata.</td></tr>
+          <tr><td><code>meta-editor.html</code></td><td>The friendly form where you add titles, stories, locations, keywords.</td></tr>
+          <tr><td><code>js/photo-meta.js</code></td><td>Where your typed info is saved (the editor produces this for you).</td></tr>
+        </table>
+      </section>
+
+      <!-- ════════════ MODULE 3 ════════════ -->
+      <section class="module" data-title="Uploading photos" data-icon="📸">
+        <p class="eyebrow">Core task</p>
+        <h1>Uploading new photos</h1>
+        <p>This is the most common job. Done right, the site reads most information automatically.</p>
+
+        <h2>Step 1 — Export from Lightroom / Photoshop <em>with metadata</em></h2>
+        <p>This single setting is the secret to letting the site fill in camera details, keywords, and GPS for you.</p>
+        <h3>Lightroom Classic</h3>
+        <ul>
+          <li>Add <strong>Title</strong>, <strong>Keywords</strong>, and <strong>Location/GPS</strong> while culling (Metadata &amp; Keywording panels; GPS in the Map module).</li>
+          <li>On export → <strong>Metadata</strong> panel → set <strong>Include: “All Metadata”</strong>.</li>
+          <li><strong>Uncheck</strong> “Remove Location Info” (so GPS is kept).</li>
+          <li>Resize long edge ~<strong>3840 px</strong>, colour space <strong>sRGB</strong>, quality ~90.</li>
+        </ul>
+        <h3>Photoshop</h3>
+        <ul>
+          <li>Add info via <strong>File → File Info</strong> (Title, Description, Keywords).</li>
+          <li><strong>Save a Copy → JPEG</strong> keeps all metadata (best). Avoid “Export As” (it strips data).</li>
+        </ul>
+
+        <h2>Step 2 — Put the photos in the right folder</h2>
+        <p>Inside the project folder you'll see folders like <code>photos_Landscape</code>, <code>photos_Astrophotography</code>, etc. Drop your new JPEGs into the matching one. <strong>A new folder named <code>photos_Something</code> automatically becomes a new gallery.</strong></p>
+        <div class="callout tip"><b>Naming tip:</b> filenames can be anything (spaces and brackets are fine). Keep the original camera names or rename — your choice.</div>
+
+        <h2>Step 3 — Run the build command</h2>
+        <p>Open a terminal in the project folder and run:</p>
+        <div class="cmd">python3 generate_manifest.py</div>
+        <p>This makes the optimized image sizes, reads the EXIF/keywords, and refreshes the galleries, search, and map. (Full detail in the next lesson.)</p>
+
+        <h2>Step 4 — Publish</h2>
+        <p>Send the changes live (covered in the “Publishing” lesson). That's it — your photos are now in their gallery, optimized, and searchable.</p>
+        <div class="callout"><b>Remember:</b> a freshly uploaded photo is already viewable and findable by its gallery name. Adding a title/story/keywords (next lessons) just makes it richer.</div>
+      </section>
+
+      <!-- ════════════ MODULE 4 ════════════ -->
+      <section class="module" data-title="The build command" data-icon="⚙️">
+        <p class="eyebrow">Behind the scenes</p>
+        <h1>The build command — <code>generate_manifest.py</code></h1>
+        <p>One command does a lot of work for you. You run it after <strong>any change to photos</strong>.</p>
+        <div class="cmd">python3 generate_manifest.py</div>
+        <h2>What it does automatically</h2>
+        <ul>
+          <li>Creates web-friendly <strong>sizes</strong> of each photo (small for grids, large for full view) in modern formats (AVIF/WebP/JPEG) inside a hidden <code>_web</code> folder.</li>
+          <li>Reads each photo's <strong>EXIF</strong> (camera, lens, exposure, date) and <strong>GPS</strong>, and any <strong>keywords/title</strong> embedded by Lightroom.</li>
+          <li>Updates the galleries list, the search index, the map pins, and the sitemap for Google.</li>
+          <li>It's <strong>incremental</strong> — only new or changed photos are processed, so re-running is quick.</li>
+        </ul>
+        <div class="callout warn"><b>If <code>python3</code> isn't found:</b> try <code>py generate_manifest.py</code> (Windows) — or ask whoever set up the computer to confirm Python is installed.</div>
+        <h2>When to run it</h2>
+        <ul>
+          <li>After adding, removing, or replacing photos.</li>
+          <li>After adding photos to the <code>prints/</code> folder.</li>
+          <li>You do <strong>not</strong> need to run it after only editing photo details in the editor (that updates a different file).</li>
+        </ul>
+      </section>
+
+      <!-- ════════════ MODULE 5 ════════════ -->
+      <section class="module" data-title="Adding photo details" data-icon="✍️">
+        <p class="eyebrow">Core task</p>
+        <h1>Adding details with the metadata editor</h1>
+        <p>This is where photos get their <strong>title, story, location, collection, and keywords</strong> — the things that power story pages, the map, collections, and search.</p>
+        <h2>Open the editor</h2>
+        <p>Double-click <code>meta-editor.html</code> in the project folder (it opens in your browser, works offline). Or open the live version at <code>/meta-editor.html</code>.</p>
+        <h2>Fill in a photo</h2>
+        <ol class="steps">
+          <li>Find the photo — use the <strong>Search</strong> box at the top or the <strong>folder dropdown</strong>; recognise it by its thumbnail.</li>
+          <li>Type into the fields you want. Camera settings are already filled from EXIF (marked “auto”). Add: <strong>Title</strong>, <strong>Collection</strong> (pick from the dropdown), <strong>Location</strong>, <strong>Coordinates</strong>, <strong>Story</strong>, <strong>Challenges</strong>, <strong>Keywords</strong>, and the <strong>Featured</strong> tick if it's a highlight.</li>
+          <li>Click <strong>Generate</strong> (or <strong>Copy</strong>) at the bottom — it produces the saved data.</li>
+          <li>Get that data into the site: either <strong>Download</strong> it (it saves <code>photo-meta.js</code>, which replaces <code>js/photo-meta.js</code>), or hand the copied text to whoever publishes.</li>
+        </ol>
+        <div class="callout tip"><b>Coverage dashboard:</b> the top of the editor shows how many photos have titles, GPS, stories, etc. Use the filters (“Missing story”, “No camera data”) to work through a big library in batches.</div>
+        <h2>Good habits</h2>
+        <ul>
+          <li>Camera fields auto-tidy as you type (<code>9.1</code> → <code>f/9.1</code>, <code>2000</code> → <code>ISO 2000</code>) — type naturally.</li>
+          <li>Your edits are safe forever — re-running the build never overwrites them.</li>
+        </ul>
+      </section>
+
+      <!-- ════════════ MODULE 6 ════════════ -->
+      <section class="module" data-title="Locations & coordinates" data-icon="📍">
+        <p class="eyebrow">How-to</p>
+        <h1>Locations &amp; map coordinates</h1>
+        <p>A photo with coordinates gets a <strong>map on its story page</strong> and a <strong>pin on the Photo Map</strong>.</p>
+        <h2>Getting coordinates</h2>
+        <ul>
+          <li><strong>Easiest:</strong> In <a href="https://www.google.com/maps" target="_blank" rel="noopener">Google Maps</a>, right-click the exact spot → click the numbers at the top to copy them (e.g. <code>6.003167, 80.256556</code>).</li>
+          <li>If your photo already has GPS from the camera/phone, it appears automatically — nothing to do.</li>
+        </ul>
+        <h2>Two formats — both accepted</h2>
+        <p>The editor's <strong>“Coordinates”</strong> field accepts either form and fills the latitude/longitude for you:</p>
+        <ul>
+          <li><strong>Decimal:</strong> <code>6.003167, 80.256556</code></li>
+          <li><strong>DMS (degrees-minutes-seconds):</strong> <code>6°00'11.4"N 80°15'23.6"E</code> — it converts to decimal automatically.</li>
+        </ul>
+        <div class="callout"><b>Note:</b> the Latitude/Longitude boxes themselves expect plain decimal numbers — but the “Coordinates” paste field handles the conversion, so just paste whatever you have there.</div>
+      </section>
+
+      <!-- ════════════ MODULE 7 ════════════ -->
+      <section class="module" data-title="Collections" data-icon="🗂️">
+        <p class="eyebrow">Organising</p>
+        <h1>Collections — grouping photos into stories</h1>
+        <p>A collection is a themed set (e.g. “Desert Adventures”, “Night Skies”). They appear in a <strong>Collections section at the bottom of the Gallery page</strong>, and each opens a view of just those photos.</p>
+        <h2>How to create one</h2>
+        <p>There's nothing to “create” — just give photos the <strong>same Collection name</strong> in the editor's Collection field, and the collection appears automatically. The dropdown suggests a ready-made list.</p>
+        <ul>
+          <li>One photo belongs to <strong>one</strong> collection.</li>
+          <li>The <strong>Featured</strong> photo (if any) becomes the collection's cover image.</li>
+          <li>Use <strong>Keywords</strong> for cross-cutting tags (like place names) — those feed search, not collections.</li>
+        </ul>
+        <div class="callout tip"><b>Suggested theme set:</b> Night Skies · Golden Hours · Cityscapes · Desert Adventures · Coast &amp; Sea · Highlands &amp; Rails · From Above · Fine Art · Faces · On the Wing.</div>
+      </section>
+
+      <!-- ════════════ MODULE 8 ════════════ -->
+      <section class="module" data-title="Photo Stories" data-icon="📖">
+        <p class="eyebrow">The flagship feature</p>
+        <h1>Photo Stories</h1>
+        <p>Every photo has its own <strong>story page</strong>: a large image (or live 360 view), the title, location, your <strong>story</strong> and <strong>challenges</strong>, the camera settings, a location map, and related images.</p>
+        <h2>How visitors reach a story</h2>
+        <ul>
+          <li>From the gallery: open a photo → click the small <strong>“Read the full story”</strong> button.</li>
+          <li>From the map: click a pin → <strong>“View full story”</strong>.</li>
+          <li>From search results: click any thumbnail.</li>
+        </ul>
+        <h2>Writing a good story</h2>
+        <ul>
+          <li><strong>Story:</strong> what the moment was, why it matters, what's happening. A short paragraph or two.</li>
+          <li><strong>Challenges:</strong> the effort behind it — the trek, the cold, the timing. People love this.</li>
+          <li>Leave a blank line between paragraphs and they'll format nicely.</li>
+        </ul>
+        <div class="callout"><b>Tip:</b> a photo with camera data and a location already makes a decent page even without a written story — but the story is what turns a portfolio into a destination.</div>
+      </section>
+
+      <!-- ════════════ MODULE 9 ════════════ -->
+      <section class="module" data-title="The Map" data-icon="🌍">
+        <p class="eyebrow">Feature</p>
+        <h1>The interactive map</h1>
+        <p>The <strong>Map</strong> page (in the menu) pins every photo that has coordinates. Pins cluster when zoomed out; click one to see the photo, then open its story. A <strong>🌍 reset button</strong> (under the zoom + / −) returns to the full view.</p>
+        <h2>How to add a pin</h2>
+        <p>Just give a photo coordinates (see the Locations lesson). On the next publish, its pin appears — no map editing needed. 360 photos open in the panorama viewer right from the map.</p>
+      </section>
+
+      <!-- ════════════ MODULE 10 ════════════ -->
+      <section class="module" data-title="Search" data-icon="🔎">
+        <p class="eyebrow">Feature</p>
+        <h1>Search</h1>
+        <p>On the Gallery page, below the galleries, is a search box. It finds photos by <strong>keywords, title, location, country, collection, gallery name, and camera</strong>. All typed words must match (so “Kuwait night” narrows precisely).</p>
+        <h2>Making photos findable</h2>
+        <ul>
+          <li>Every photo is searchable by its <strong>gallery name</strong> the moment it's uploaded.</li>
+          <li>Add <strong>Keywords</strong> (in Lightroom or the editor) to make it findable by subject, place, and mood.</li>
+          <li>Think like a visitor: subject (camel, dunes, Milky Way), place (Riyadh, Sri Lanka), mood (sunset, foggy, blue hour). 5–10 keywords per photo.</li>
+        </ul>
+      </section>
+
+      <!-- ════════════ MODULE 11 ════════════ -->
+      <section class="module" data-title="360° panoramas" data-icon="🌐">
+        <p class="eyebrow">Feature</p>
+        <h1>360° panoramas</h1>
+        <p>Equirectangular 360 photos go in the <code>photos_360</code> folder. They open in a <strong>drag-to-look viewer</strong> in the gallery, on the map, and on their story page, and they rotate live in the home hero.</p>
+        <h2>Setting a 360's location</h2>
+        <p>360 photos often lack GPS, so their map location is set by hand in <code>js/pano-locations.js</code>, keyed by filename. To set or change one, ask the developer (or give them the coordinates) — same decimal/DMS rules apply.</p>
+      </section>
+
+      <!-- ════════════ MODULE 12 ════════════ -->
+      <section class="module" data-title="Publishing changes" data-icon="🚀">
+        <p class="eyebrow">Going live</p>
+        <h1>Publishing your changes</h1>
+        <p>Nothing is live until it's published. There are two routes depending on how you're set up.</p>
+        <h2>Route A — You publish it yourself</h2>
+        <p>In a terminal in the project folder:</p>
+        <div class="cmd">git add -A
+git commit -m "Add new photos and details"
+git push</div>
+        <p>Netlify sees the change and rebuilds the live site automatically in ~1–2 minutes.</p>
+        <h2>Route B — Hand it over</h2>
+        <p>If you'd rather not use the terminal, give the changed files (or the copied <code>photo-meta.js</code> text from the editor) to whoever manages the site, and they'll publish it.</p>
+        <h2>Check it went live</h2>
+        <ol class="steps">
+          <li>Wait ~2 minutes.</li>
+          <li>Open the site and press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (a “hard refresh”) to bypass the cache.</li>
+          <li>Confirm your change shows.</li>
+        </ol>
+        <div class="callout warn"><b>If a change doesn't appear,</b> it's almost always the browser cache — hard-refresh, or wait a couple more minutes for the edge to update.</div>
+      </section>
+
+      <!-- ════════════ MODULE 13 ════════════ -->
+      <section class="module" data-title="Other editable parts" data-icon="🧩">
+        <p class="eyebrow">Reference</p>
+        <h1>Other things you can update</h1>
+        <p>These are small, occasional edits. Each lives in one simple file.</p>
+        <table>
+          <tr><th>What</th><th>Where</th></tr>
+          <tr><td><strong>Stats numbers</strong> (Countries, Years, etc.)</td><td><code>index.html</code> — the <code>data-target</code> numbers in the “By the numbers” section.</td></tr>
+          <tr><td><strong>Pexels showcase</strong> photos</td><td><code>js/pexels.js</code> — add photo entries (id + page URL).</td></tr>
+          <tr><td><strong>Newsletter</strong> wording</td><td>The newsletter section text on each page.</td></tr>
+          <tr><td><strong>Prints</strong> images</td><td>Drop images in the <code>prints/</code> folder and run the build.</td></tr>
+          <tr><td><strong>Timeline</strong> milestones</td><td><code>about.html</code> — the timeline list.</td></tr>
+          <tr><td><strong>Social links</strong> (Instagram/Facebook/YouTube)</td><td>The <code>#</code> placeholder links in the newsletter and footer.</td></tr>
+        </table>
+        <div class="callout tip">For any of these, the safest path is to tell the developer exactly what to change — or follow the file note and run the build/publish steps.</div>
+      </section>
+
+      <!-- ════════════ MODULE 14 ════════════ -->
+      <section class="module" data-title="SEO & Google" data-icon="🔍">
+        <p class="eyebrow">Discoverability</p>
+        <h1>SEO &amp; Google</h1>
+        <p>Most SEO is automatic. The build creates a <strong>sitemap</strong> (a list of every page, including each photo's story) and the pages carry <strong>share-cards</strong> (so links show a preview image) and <strong>structured data</strong> for Google.</p>
+        <h2>What you do</h2>
+        <ul>
+          <li><strong>Once:</strong> submit the sitemap in <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console</a> (Sitemaps → enter <code>sitemap.xml</code> → Submit).</li>
+          <li><strong>Ongoing:</strong> write good titles, locations, and keywords — that's what Google indexes. The sitemap refreshes itself on every build.</li>
+        </ul>
+        <div class="callout warn"><b>When the site moves to its own domain</b> (e.g. <code>liophotography.com</code>), the developer updates one setting (<code>SITE_URL</code>) so share-cards and the sitemap point to the new address.</div>
+      </section>
+
+      <!-- ════════════ MODULE 15 ════════════ -->
+      <section class="module" data-title="File map & help" data-icon="🛠️">
+        <p class="eyebrow">Reference</p>
+        <h1>File map &amp; troubleshooting</h1>
+        <h2>What each thing is</h2>
+        <table>
+          <tr><th>File / folder</th><th>Purpose</th></tr>
+          <tr><td><code>photos_*</code></td><td>Your photos. Each folder = a gallery.</td></tr>
+          <tr><td><code>prints/</code>, <code>Video/</code></td><td>Print images and video clips.</td></tr>
+          <tr><td><code>generate_manifest.py</code></td><td>The build command (optimize + read metadata).</td></tr>
+          <tr><td><code>meta-editor.html</code></td><td>The editor for photo details.</td></tr>
+          <tr><td><code>js/photo-meta.js</code></td><td>Your typed photo details (from the editor).</td></tr>
+          <tr><td><code>js/pano-locations.js</code></td><td>Locations for 360 photos.</td></tr>
+          <tr><td><code>js/pexels.js</code></td><td>The Pexels showcase list.</td></tr>
+          <tr><td><code>index / gallery / about / contact / blog / map / story</code> .html</td><td>The site's pages.</td></tr>
+        </table>
+        <h2>Common questions</h2>
+        <h3>My change isn't showing</h3>
+        <p>Hard-refresh (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>), wait 2 minutes, and confirm it was published (pushed to GitHub).</p>
+        <h3>A photo has no camera info / no map</h3>
+        <p>Its file was exported without metadata. Re-export from Lightroom with “All Metadata”, or type the details in the editor.</p>
+        <h3>The 360 viewer is blank when I open a file directly</h3>
+        <p>360 needs the site served over the web (not opened as a local file). Use the live site, or the local helper to serve it.</p>
+        <div class="callout">When in doubt, write down exactly what you did and what you expected, and send it to the developer — that's the fastest way to get unstuck.</div>
+      </section>
+
+      <!-- ════════════ MODULE 16 ════════════ -->
+      <section class="module" data-title="Keeping this course updated" data-icon="🆕">
+        <p class="eyebrow">Maintenance</p>
+        <h1>Keeping this course up to date</h1>
+        <p>As the website grows, this course should grow with it. It's built so that's easy.</p>
+        <h2>How to add a new lesson</h2>
+        <p>This course is a single file: <code>course_on_LioPhotography_site/index.html</code>. Each lesson is one block that looks like this:</p>
+        <div class="cmd">&lt;section class="module" data-title="My New Feature" data-icon="✨"&gt;
+  &lt;h1&gt;Title&lt;/h1&gt;
+  &lt;p&gt;...explain the feature...&lt;/p&gt;
+&lt;/section&gt;</div>
+        <p>Add a new <code>&lt;section class="module"&gt;</code> anywhere among the others — the menu, numbering, and progress bar update themselves. (Easiest: ask the developer to add it whenever a feature ships.)</p>
+        <h2>Change log</h2>
+        <ul>
+          <li><strong>Jun 2026</strong> — Initial course: photos, details editor, collections, stories, map, search, 360, publishing, SEO.</li>
+        </ul>
+        <div class="callout tip">🎉 You've reached the end. You now know how to run this whole website. Revisit any lesson anytime from the menu.</div>
+      </section>
+
+      <div class="pager">
+        <button class="btn ghost" id="prev">← Previous</button>
+        <button class="btn" id="markdone">Mark complete ✓</button>
+        <button class="btn" id="next">Next →</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  var modules = Array.prototype.slice.call(document.querySelectorAll(".module"));
+  var toc = document.getElementById("toc");
+  var KEY = "lio_course_done_v1";
+  var done = {};
+  try { done = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch(e){ done = {}; }
+  var current = 0;
+
+  // Build the sidebar
+  modules.forEach(function(m, i){
+    m.id = "m" + i;
+    var a = document.createElement("a");
+    a.dataset.i = i;
+    a.innerHTML = '<span class="ico">' + (m.dataset.icon||"•") + '</span>' +
+                  '<span>' + (i+1) + '. ' + m.dataset.title + '</span>' +
+                  '<span class="done">✓</span>';
+    a.addEventListener("click", function(){ show(i); if(window.innerWidth<=880) document.body.classList.remove("nav-open"); });
+    toc.appendChild(a);
+  });
+  var links = Array.prototype.slice.call(toc.children);
+
+  function refreshProgress(){
+    var n = Object.keys(done).filter(function(k){return done[k];}).length;
+    var pct = Math.round(n / modules.length * 100);
+    document.getElementById("progbar").style.width = pct + "%";
+    document.getElementById("proglbl").textContent = pct + "% complete · " + n + " of " + modules.length + " lessons";
+    links.forEach(function(a, i){ a.classList.toggle("completed", !!done["m"+i]); });
+  }
+
+  function show(i){
+    current = Math.max(0, Math.min(modules.length-1, i));
+    modules.forEach(function(m, j){ m.classList.toggle("active", j===current); });
+    links.forEach(function(a, j){ a.classList.toggle("active", j===current); });
+    document.getElementById("crumb").textContent = (current+1) + ". " + modules[current].dataset.title;
+    document.getElementById("counter").textContent = (current+1) + " / " + modules.length;
+    document.getElementById("prev").disabled = current===0;
+    document.getElementById("next").disabled = current===modules.length-1;
+    var btn = document.getElementById("markdone");
+    btn.textContent = done["m"+current] ? "Completed ✓" : "Mark complete ✓";
+    window.scrollTo({top:0, behavior:"smooth"});
+    document.querySelector("main").scrollTop = 0;
+    location.hash = "lesson-" + (current+1);
+  }
+
+  document.getElementById("prev").addEventListener("click", function(){ show(current-1); });
+  document.getElementById("next").addEventListener("click", function(){ show(current+1); });
+  document.getElementById("markdone").addEventListener("click", function(){
+    done["m"+current] = !done["m"+current];
+    localStorage.setItem(KEY, JSON.stringify(done));
+    refreshProgress();
+    document.getElementById("markdone").textContent = done["m"+current] ? "Completed ✓" : "Mark complete ✓";
+    if(done["m"+current] && current < modules.length-1) setTimeout(function(){ show(current+1); }, 350);
+  });
+
+  // Copy buttons on command blocks
+  document.querySelectorAll(".cmd").forEach(function(box){
+    var b = document.createElement("button");
+    b.className = "copy"; b.textContent = "Copy";
+    b.addEventListener("click", function(){
+      var text = box.cloneNode(true); var btn = text.querySelector(".copy"); if(btn) btn.remove();
+      navigator.clipboard.writeText(text.textContent.trim()).then(function(){ b.textContent="Copied ✓"; setTimeout(function(){b.textContent="Copy";},1500); });
+    });
+    box.appendChild(b);
+  });
+
+  // Keyboard arrows
+  document.addEventListener("keydown", function(e){
+    if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA") return;
+    if(e.key==="ArrowRight") show(current+1);
+    if(e.key==="ArrowLeft") show(current-1);
+  });
+
+  // Open the lesson from the URL hash if present
+  var start = 0; var h = (location.hash.match(/lesson-(\d+)/)); if(h) start = parseInt(h[1],10)-1;
+  refreshProgress();
+  show(start);
+})();
+</script>
+</body>
+</html>
