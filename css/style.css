@@ -389,6 +389,7 @@ body.menu-open .nav-toggle span:nth-child(3) { transform: translateY(-8px) rotat
 /* ---------- Photo search ---------- */
 .gallery-search { margin-top: 26px; }
 .gallery-search input {
+  display: block; margin: 0 auto;
   width: 100%; max-width: 560px;
   background: var(--surface); border: 1px solid var(--line); color: var(--text);
   padding: 13px 20px; font: inherit; border-radius: 999px;

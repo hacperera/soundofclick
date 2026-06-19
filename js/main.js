@@ -933,7 +933,6 @@
     if (!input) return;
     var results = document.getElementById("search-results");
     var status = document.getElementById("search-status");
-    var browse = document.getElementById("browse-galleries");
     var coll = document.getElementById("collections-section");
 
     // Build a searchable index from each photo's metadata.
@@ -952,15 +951,14 @@
       var raw = input.value.trim(), q = raw.toLowerCase();
       if (!q) {
         results.style.display = "none"; results.innerHTML = ""; status.textContent = "";
-        if (browse) browse.style.display = ""; if (coll) coll.style.display = "";
+        if (coll) coll.style.display = "";   // galleries stay visible; restore collections
         return;
       }
       var words = q.split(/\s+/);
       var hits = index.filter(function (it) {
         return words.every(function (w) { return it.text.indexOf(w) >= 0; });
       });
-      if (browse) browse.style.display = "none";
-      if (coll) coll.style.display = "none";
+      if (coll) coll.style.display = "none";   // collapse collections to focus on results
       results.style.display = "";
       results.innerHTML = "";
       status.textContent = hits.length + " photo" + (hits.length === 1 ? "" : "s") + " for “" + raw + "”";
