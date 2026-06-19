@@ -386,6 +386,27 @@ body.menu-open .nav-toggle span:nth-child(3) { transform: translateY(-8px) rotat
 .gallery-intro { padding-top: calc(var(--nav-h) + clamp(24px, 4.5vh, 50px)); }
 .gallery-intro .section-head h2 { font-size: clamp(26px, 4vw, 44px); }
 
+/* ---------- Photo search ---------- */
+.gallery-search { margin-top: 26px; }
+.gallery-search input {
+  width: 100%; max-width: 560px;
+  background: var(--surface); border: 1px solid var(--line); color: var(--text);
+  padding: 13px 20px; font: inherit; border-radius: 999px;
+  transition: border-color .3s ease;
+}
+.gallery-search input::placeholder { color: var(--text-faint); }
+.gallery-search input:focus { outline: none; border-color: var(--accent); }
+.search-status { color: var(--text-dim); font-size: 13px; letter-spacing: .04em; margin: 12px 0 0; min-height: 18px; }
+.search-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px; margin-top: 10px;
+}
+.search-tile { display: block; overflow: hidden; border-radius: 6px; background: var(--surface); }
+.search-tile img { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block;
+  transition: transform .5s cubic-bezier(.2,.7,.2,1); }
+.search-tile:hover img { transform: scale(1.06); }
+@media (max-width: 560px) { .search-grid { grid-template-columns: repeat(2, 1fr); } }
+
 .filters {
   display: flex; flex-wrap: wrap; gap: 10px;
   margin-top: 38px;

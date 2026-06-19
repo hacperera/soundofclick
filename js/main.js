@@ -927,6 +927,55 @@
     });
   }
 
+  /* ---------- Keyword photo search (gallery page) ---------- */
+  function initSearch() {
+    var input = document.getElementById("photo-search");
+    if (!input) return;
+    var results = document.getElementById("search-results");
+    var status = document.getElementById("search-status");
+    var browse = document.getElementById("browse-galleries");
+    var coll = document.getElementById("collections-section");
+
+    // Build a searchable index from each photo's metadata.
+    var index = [];
+    DATA.forEach(function (cat) {
+      cat.images.forEach(function (file) {
+        var m = photoMeta(cat.folder, file);
+        var text = [cat.title, m.title, m.location, m.country, m.city, m.caption,
+                    m.collection, (m.keywords || []).join(" "), m.camera, m.lens]
+                   .filter(Boolean).join(" ").toLowerCase();
+        index.push({ folder: cat.folder, file: file, cat: cat.title, text: text });
+      });
+    });
+
+    function run() {
+      var raw = input.value.trim(), q = raw.toLowerCase();
+      if (!q) {
+        results.style.display = "none"; results.innerHTML = ""; status.textContent = "";
+        if (browse) browse.style.display = ""; if (coll) coll.style.display = "";
+        return;
+      }
+      var words = q.split(/\s+/);
+      var hits = index.filter(function (it) {
+        return words.every(function (w) { return it.text.indexOf(w) >= 0; });
+      });
+      if (browse) browse.style.display = "none";
+      if (coll) coll.style.display = "none";
+      results.style.display = "";
+      results.innerHTML = "";
+      status.textContent = hits.length + " photo" + (hits.length === 1 ? "" : "s") + " for “" + raw + "”";
+      hits.forEach(function (it) {
+        var a = document.createElement("a");
+        a.className = "search-tile";
+        a.href = "story.html?photo=" + encodeURIComponent(it.folder + "/" + it.file);
+        a.appendChild(buildPicture(it.folder, it.file, "(max-width:700px) 50vw, (max-width:1100px) 33vw, 25vw", { alt: it.cat }));
+        results.appendChild(a);
+      });
+    }
+    var t;
+    input.addEventListener("input", function () { clearTimeout(t); t = setTimeout(run, 120); });
+  }
+
   /* ---------- Statistics count-up ---------- */
   function initStats() {
     var nums = document.querySelectorAll(".stat-num");
@@ -1062,6 +1111,7 @@
     initLightboxControls();
     initPanoControls();
     initStats();
+    initSearch();
     initPexels();
     initNewsletter();
     initReveal();

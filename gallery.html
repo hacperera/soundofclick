@@ -45,10 +45,17 @@
     <div class="wrap">
       <p class="eyebrow">Portfolio</p>
       <div class="section-head"><h2>Galleries.</h2><p>Each series is its own immersive scroll. Choose where to wander.</p></div>
+      <div class="gallery-search">
+        <input type="search" id="photo-search" autocomplete="off"
+               placeholder="Search photos — “desert sunset”, “Kuwait night”, “Milky Way”…" aria-label="Search photos">
+        <p class="search-status" id="search-status"></p>
+      </div>
     </div>
   </section>
 
-  <div class="wrap">
+  <div class="wrap"><div class="search-grid" id="search-results" style="display:none"></div></div>
+
+  <div class="wrap" id="browse-galleries">
     <div class="cat-grid" id="cat-grid"></div>
   </div>
 
