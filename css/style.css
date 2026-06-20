@@ -95,6 +95,8 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.08; mar
   font-size: 26px;
   letter-spacing: 0.04em;
   font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
 }
 .brand b { color: var(--accent); font-weight: 600; }
 
@@ -122,17 +124,16 @@ h1, h2, h3 { font-family: var(--serif); font-weight: 500; line-height: 1.08; mar
 .nav-links a.active::after { width: 100%; }
 
 .nav-toggle {
-  display: none;
-  background: none; border: 0; cursor: pointer;
-  width: 30px; height: 22px; position: relative;
+  display: none;            /* shown as flex in the mobile media queries */
+  flex-direction: column; justify-content: center; align-items: flex-end; gap: 6px;
+  background: none; border: 0; cursor: pointer; padding: 0;
+  width: 44px; height: 44px;   /* full tap target; bars stay centered, never clipped */
 }
 .nav-toggle span {
-  position: absolute; left: 0; width: 100%; height: 1.5px; background: var(--text);
+  display: block; width: 26px; height: 2px; border-radius: 2px;
+  background: var(--text);
   transition: transform .35s ease, opacity .3s ease;
 }
-.nav-toggle span:nth-child(1) { top: 2px; }
-.nav-toggle span:nth-child(2) { top: 10px; }
-.nav-toggle span:nth-child(3) { top: 18px; }
 body.menu-open .nav-toggle span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
 body.menu-open .nav-toggle span:nth-child(2) { opacity: 0; }
 body.menu-open .nav-toggle span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
@@ -895,7 +896,7 @@ form textarea { resize: vertical; min-height: 140px; }
   .footer-top { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px) {
-  .nav-toggle { display: block; }
+  .nav-toggle { display: flex; }
   .nav-links {
     position: fixed; inset: var(--nav-h) 0 auto 0;
     flex-direction: column; gap: 0;
@@ -916,7 +917,7 @@ form textarea { resize: vertical; min-height: 140px; }
 /* Nav has 6 items — collapse to the hamburger early (tablets + large phones)
    so the bar never crowds. Supersedes the 640px nav rules for 641–860px. */
 @media (max-width: 860px) {
-  .nav-toggle { display: block; }
+  .nav-toggle { display: flex; }
   .nav-links {
     position: fixed; inset: var(--nav-h) 0 auto 0;
     flex-direction: column; gap: 0;
