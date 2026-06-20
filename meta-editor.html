@@ -41,6 +41,11 @@
     .badge.empty{ background:rgba(224,138,138,.16); color:#e08a8a; }
     .fields{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
     .fields .full{ grid-column:1 / -1; }
+    @media (max-width:640px){
+      .card{ grid-template-columns:1fr; gap:12px; }
+      .thumb{ width:100%; max-width:280px; }
+      .fields{ grid-template-columns:1fr; }
+    }
     label{ display:block; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); margin-bottom:3px; }
     .hint{ font-size:10px; color:var(--dim); font-weight:400; text-transform:none; letter-spacing:0; }
     .chk{ display:flex; align-items:center; gap:8px; }
