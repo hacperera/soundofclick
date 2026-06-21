@@ -19,3 +19,4 @@ Information.txt
 # Logs and archives (kept out of the deploy)
 *.log
 *.zip
+Mobile_viewer*.jpeg
