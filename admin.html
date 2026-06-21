@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lio Photography Studio — Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=2">
   <style>
     body { background: var(--bg-soft); }
     .studio { max-width: 980px; margin: 0 auto; padding: 40px clamp(18px,4vw,40px) 80px; }
@@ -107,10 +107,10 @@
     <section class="panel" id="tab-messages">
       <div class="card">
         <h3>Where messages go</h3>
-        <p class="muted">The contact form is wired to <b>FormSubmit</b>, which forwards every enquiry to <code>hacperera@gmail.com</code>. So today, your inbox <i>is</i> your message dashboard — no server required.</p>
+        <p class="muted">The contact form is wired to <b>Netlify Forms</b>. Every enquiry is captured in your Netlify dashboard under <b>Forms → contact</b> — no email address is exposed anywhere on the site.</p>
         <ul class="muted">
-          <li>Each submission arrives as an email you can reply to directly.</li>
-          <li>FormSubmit also offers a free dashboard and CSV export at <a class="lnk" href="https://formsubmit.co" target="_blank" rel="noopener">formsubmit.co</a>.</li>
+          <li>Open your site in Netlify → <b>Forms</b> to read and export submissions.</li>
+          <li>To get enquiries emailed to you, add a notification under <b>Forms → Settings &amp; notifications</b> (use your new domain email once it's ready).</li>
         </ul>
         <div class="note">When you publish on a host with built-in forms (e.g. Netlify Forms) or add a small backend, messages can be stored in a database and listed right here. See <a class="lnk" href="DASHBOARD.md">DASHBOARD.md</a>.</div>
       </div>

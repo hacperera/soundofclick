@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=2">
 </head>
 <body>
 
@@ -55,14 +55,15 @@
           <h2>Get in touch.</h2>
           <p>Tell me a little about what you have in mind — a wall that needs a print, an image to licence, or a project to shoot — and I'll get back to you as soon as I can.</p>
           <ul class="contact-list">
-            <li><div class="k">Email</div><div class="v"><a href="mailto:hacperera@gmail.com">hacperera@gmail.com</a></div></li>
             <li><div class="k">Based in</div><div class="v">Sri Lanka · available worldwide</div></li>
             <li><div class="k">Social</div><div class="v"><a href="#">Instagram</a> &nbsp;/&nbsp; <a href="#">Facebook</a></div></li>
           </ul>
         </div>
 
         <div class="reveal-up">
-          <form id="contact-form" action="https://formsubmit.co/hacperera@gmail.com" method="POST">
+          <form id="contact-form" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+            <input type="hidden" name="form-name" value="contact">
+            <p hidden><label>Leave this empty: <input name="bot-field"></label></p>
             <div class="field">
               <label for="name">Name</label>
               <input id="name" name="name" type="text" required>
@@ -85,7 +86,7 @@
               <textarea id="message" name="message" required></textarea>
             </div>
             <button class="btn btn--accent" type="submit">Send message</button>
-            <p class="form-note">This form is wired to <strong>FormSubmit</strong> and delivers to hacperera@gmail.com. The first submission triggers a one-time confirmation email — or swap in your preferred form service.</p>
+            <p class="form-note">Send me a message and I'll get back to you as soon as I can.</p>
           </form>
         </div>
 
@@ -112,7 +113,7 @@
         <div>
           <h4>Connect</h4>
           <ul>
-            <li><a href="mailto:hacperera@gmail.com">Email</a></li>
+            <li><a href="contact.html">Contact</a></li>
             <li><a href="#" target="_blank" rel="noopener">Instagram</a></li>
             <li><a href="#" target="_blank" rel="noopener">Facebook</a></li>
           </ul>

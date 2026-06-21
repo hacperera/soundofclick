@@ -908,7 +908,14 @@ form textarea { resize: vertical; min-height: 140px; }
   body.menu-open .nav-links { transform: none; }
   .nav-links a { padding: 16px clamp(20px,5vw,64px); width: 100%; }
   .nav-links a::after { display: none; }
-  .masonry { column-count: 1; }
+  /* Gallery photos go edge-to-edge full width on phones (out to the screen edges,
+     cancelling the .wrap side padding) so each image fills the mobile screen. */
+  .masonry {
+    column-count: 1; column-gap: 0; margin-top: 24px;
+    margin-left: calc(-1 * clamp(20px, 5vw, 64px));
+    margin-right: calc(-1 * clamp(20px, 5vw, 64px));
+  }
+  .masonry .tile { margin-bottom: 4px; }
   .services, .cat-grid, .blog-grid, .footer-top { grid-template-columns: 1fr; }
   .lb-btn { font-size: 30px; padding: 12px; }
   .hero-content p { white-space: normal; max-width: 420px; }
