@@ -634,6 +634,10 @@
       var tile = document.createElement("figure");
       tile.className = "tile" + (isPano ? " tile--360" : "");
       tile.dataset.idx = i;
+      // Orientation drives the mobile mosaic layout (see layoutMosaic).
+      var ar = (m && m.w && m.h) ? (m.w / m.h) : 1.5;
+      tile.dataset.ar = ar.toFixed(4);
+      tile.classList.add(isPano ? "tm-pano" : (ar < 0.92 ? "tm-p" : (ar > 1.25 ? "tm-l" : "tm-sq")));
       tile.appendChild(buildPicture(it.folder, it.file,
         "(max-width:700px) 100vw, (max-width:1100px) 50vw, 33vw",
         { alt: it.cat + " photograph" }));
@@ -657,6 +661,7 @@
     });
     panoTour.items = panoItems;
     revealTiles();
+    layoutMosaic(grid);
 
     // Re-render if the user navigates between series via hash change (bind once)
     if (!initSeries._bound) {
@@ -667,7 +672,45 @@
         window.scrollTo({ top: 0 });
         initSeries();
       });
+      // Recompute the mosaic when the screen size / orientation changes.
+      var rt;
+      window.addEventListener("resize", function () {
+        clearTimeout(rt);
+        rt = setTimeout(function () { layoutMosaic(document.getElementById("masonry")); }, 150);
+      });
     }
+  }
+
+  /* Mobile-only mixed mosaic. Reads each tile's orientation (set in initSeries)
+     and assigns a CSS-grid column span (portrait 2/6 → 3-up, square 3/6 → 2-up,
+     landscape 3 or 6, 360 full-width) plus a row span computed from the photo's
+     aspect ratio so the grid packs tight and gap-free. On desktop it clears the
+     inline spans so the original CSS column masonry is used unchanged. */
+  function layoutMosaic(grid) {
+    if (!grid) return;
+    var tiles = grid.querySelectorAll(".tile");
+    if (!window.matchMedia("(max-width: 640px)").matches) {
+      grid.classList.remove("mosaic");
+      tiles.forEach(function (t) { t.style.gridColumn = ""; t.style.gridRowEnd = ""; });
+      return;
+    }
+    grid.classList.add("mosaic");
+    var COLS = 6, ROW = 5, GAP = 5;
+    var gridW = grid.clientWidth;
+    if (!gridW) return;
+    var colW = (gridW - GAP * (COLS - 1)) / COLS;
+    var landCount = 0;
+    tiles.forEach(function (t) {
+      var ar = parseFloat(t.dataset.ar) || 1.5, span;
+      if (t.classList.contains("tm-pano")) span = 6;
+      else if (t.classList.contains("tm-p")) span = 2;
+      else if (t.classList.contains("tm-sq")) span = 3;
+      else { span = (landCount % 3 === 0) ? 6 : 3; landCount++; }   // every 3rd landscape full-width
+      t.style.gridColumn = "span " + span;
+      var w = colW * span + GAP * (span - 1);
+      var rowSpan = Math.max(1, Math.round((w / ar + GAP) / (ROW + GAP)));
+      t.style.gridRowEnd = "span " + rowSpan;
+    });
   }
 
   /* ---------- Lightbox ---------- */

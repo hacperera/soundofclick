@@ -916,6 +916,24 @@ form textarea { resize: vertical; min-height: 140px; }
     margin-right: calc(-1 * clamp(20px, 5vw, 64px));
   }
   .masonry .tile { margin-bottom: 4px; }
+
+  /* Mixed mosaic album view (phones only). JS adds .mosaic and sets each tile's
+     column/row span from its orientation: portraits 3-up, landscapes 2-up, some
+     landscapes/360s full-width. Remove .mosaic + the JS to revert to the simple
+     single-column view above. Desktop is untouched (uses CSS column masonry). */
+  #masonry.mosaic {
+    column-count: auto;            /* cancel the base column masonry */
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: 5px;
+    gap: 5px;
+    margin-top: 20px;
+    margin-left: calc(-1 * clamp(20px, 5vw, 64px));
+    margin-right: calc(-1 * clamp(20px, 5vw, 64px));
+  }
+  #masonry.mosaic .tile { margin: 0; height: 100%; }
+  #masonry.mosaic .tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
   .services, .cat-grid, .blog-grid, .footer-top { grid-template-columns: 1fr; }
   .lb-btn { font-size: 30px; padding: 12px; }
   .hero-content p { white-space: normal; max-width: 420px; }
